@@ -80,10 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initApp() {
-    // מחיקה חד-פעמית של נתוני הדמו הישנים מהדפדפן
-    if (!localStorage.getItem('bugdex_version_reset_v3')) {
+    // מחיקה חד-פעמית של נתוני הדמו הישנים מהדפדפן ואיפוס מצב ענן
+    if (!localStorage.getItem('bugdex_version_reset_v4')) {
         localStorage.removeItem('bugdex_local_observations');
-        localStorage.setItem('bugdex_version_reset_v3', 'true');
+        localStorage.removeItem('bugdex_use_demo');
+        localStorage.setItem('bugdex_version_reset_v4', 'true');
     }
 
     // 1. הגדרת השנה הנוכחית בפוטר
