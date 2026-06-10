@@ -96,6 +96,12 @@ function initApp() {
         localStorage.setItem('bugdex_version_reset_v5', 'true');
     }
 
+    // מחיקת מפתח ישן שאינו פעיל
+    if (localStorage.getItem('bugdex_supabase_key') === 'sb_publishable_-o9hUJ4nF6POupZukkC_5w_K7n2RWOt') {
+        localStorage.removeItem('bugdex_supabase_key');
+        localStorage.removeItem('bugdex_supabase_url');
+    }
+
     // 1. הגדרת השנה הנוכחית בפוטר
     if (dom.spanCurrentYear) {
         dom.spanCurrentYear.innerText = new Date().getFullYear();
@@ -195,7 +201,7 @@ function loadCloudCredentials() {
     let key = localStorage.getItem('bugdex_supabase_key');
     
     const defaultUrl = "https://jypdrvdhqffcolplwxvi.supabase.co";
-    const defaultKey = atob("c2JfcHVibGlzaGFibGVfLW85aFVKNG5GNlBPdXBadWtrQ181d19LN24yUldPdA==");
+    const defaultKey = atob("c2JfcHVibGlzaGFibGVfX3RtUDFQZTdNVVlwRl9BaW5zNnBlQV9oYXBnTnJiYQ==");
 
     if (useDemo) {
         initDemoMode();
