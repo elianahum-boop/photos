@@ -16,6 +16,8 @@ let searchQuery = "";
 let currentSelectedObservation = null;
 let editingObservationId = null;
 let selectedImageFile = null;
+let cropperInstance = null;
+let activeCroppingFile = null;
 
 // --- אלמנטים מה-DOM ---
 const dom = {
@@ -76,6 +78,14 @@ const dom = {
     lightboxNotes: document.getElementById('lightbox-bug-notes'),
     btnDeleteObservation: document.getElementById('btn-delete-observation'),
     btnEditObservation: document.getElementById('btn-edit-observation'),
+    
+    // קרופר וחיתוך תמונה
+    modalCropper: document.getElementById('modal-cropper-overlay'),
+    cropperSourceImg: document.getElementById('cropper-source-img'),
+    btnCropperRotateCcw: document.getElementById('btn-cropper-rotate-ccw'),
+    btnCropperRotateCw: document.getElementById('btn-cropper-rotate-cw'),
+    btnCropperCancel: document.getElementById('btn-cropper-cancel'),
+    btnCropperSave: document.getElementById('btn-cropper-save'),
     
     // מסך התקדמות
     modalUploading: document.getElementById('modal-uploading-overlay')
@@ -165,11 +175,25 @@ function registerEventListeners() {
     dom.btnDeleteObservation.addEventListener('click', handleDeleteObservation);
     dom.btnEditObservation.addEventListener('click', handleEditObservationClick);
     
+    // קרופר וחיתוך תמונה
+    dom.btnCropperRotateCcw.addEventListener('click', () => {
+        if (cropperInstance) cropperInstance.rotate(-90);
+    });
+    dom.btnCropperRotateCw.addEventListener('click', () => {
+        if (cropperInstance) cropperInstance.rotate(90);
+    });
+    dom.btnCropperCancel.addEventListener('click', closeCropperModal);
+    dom.btnCropperSave.addEventListener('click', handleCropperSave);
+    dom.modalCropper.addEventListener('click', (e) => {
+        if (e.target === dom.modalCropper) closeCropperModal();
+    });
+    
     // תמיכה במקש Escape לסגירת מודלים
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeSettingsModal();
             closeLightboxModal();
+            closeCropperModal();
         }
     });
 }
@@ -377,11 +401,6 @@ async function handleSelectedImageFile(file) {
         return;
     }
     
-    // שחרור Object URL קודם למניעת דליפות זיכרון
-    if (dom.imgPreview.src && dom.imgPreview.src.startsWith('blob:')) {
-        URL.revokeObjectURL(dom.imgPreview.src);
-    }
-    
     if (isHeic) {
         // הצגת לואדר
         dom.dropzonePlaceholder.classList.add('hidden');
@@ -402,17 +421,15 @@ async function handleSelectedImageFile(file) {
             const blobResult = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
             const newName = file.name.replace(/\.(heic|heif)$/i, '.jpg');
             
-            selectedImageFile = new File([blobResult], newName, {
+            const convertedFile = new File([blobResult], newName, {
                 type: 'image/jpeg',
                 lastModified: new Date()
             });
             
-            const objectUrl = URL.createObjectURL(selectedImageFile);
-            dom.imgPreview.src = objectUrl;
-            
             dom.dropzoneLoader.classList.add('hidden');
-            dom.dropzonePreview.classList.remove('hidden');
-            dom.inputFileImage.required = false;
+            
+            // פתיחת מודל חיתוך עם הקובץ המומר
+            openCropperModal(convertedFile);
             
         } catch (error) {
             console.error("שגיאה בהמרת קובץ HEIC:", error);
@@ -420,14 +437,96 @@ async function handleSelectedImageFile(file) {
             resetImagePreview();
         }
     } else {
-        selectedImageFile = file;
-        const objectUrl = URL.createObjectURL(file);
+        // פתיחת מודל חיתוך עם הקובץ המקורי
+        openCropperModal(file);
+    }
+}
+
+function openCropperModal(file) {
+    activeCroppingFile = file;
+    
+    const objectUrl = URL.createObjectURL(file);
+    dom.cropperSourceImg.src = objectUrl;
+    
+    dom.modalCropper.classList.remove('hidden');
+    
+    if (cropperInstance) {
+        cropperInstance.destroy();
+    }
+    
+    cropperInstance = new Cropper(dom.cropperSourceImg, {
+        aspectRatio: NaN, // חיתוך חופשי
+        viewMode: 1,
+        autoCropArea: 0.9,
+        responsive: true,
+        background: false,
+    });
+    
+    lucide.createIcons();
+}
+
+function closeCropperModal() {
+    dom.modalCropper.classList.add('hidden');
+    if (cropperInstance) {
+        cropperInstance.destroy();
+        cropperInstance = null;
+    }
+    if (dom.cropperSourceImg.src && dom.cropperSourceImg.src.startsWith('blob:')) {
+        URL.revokeObjectURL(dom.cropperSourceImg.src);
+    }
+    dom.cropperSourceImg.src = "";
+    activeCroppingFile = null;
+    
+    if (!selectedImageFile && !editingObservationId) {
+        dom.inputFileImage.value = "";
+        dom.inputFileImage.required = true;
+    }
+}
+
+function handleCropperSave() {
+    if (!cropperInstance || !activeCroppingFile) return;
+    
+    const canvas = cropperInstance.getCroppedCanvas({
+        maxWidth: 1600,
+        maxHeight: 1600,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high',
+    });
+    
+    if (!canvas) {
+        alert("שגיאה בעיבוד התמונה החתוכה.");
+        return;
+    }
+    
+    canvas.toBlob((blob) => {
+        if (!blob) {
+            alert("שגיאה ביצירת קובץ תמונה.");
+            return;
+        }
+        
+        const originalName = activeCroppingFile.name;
+        const baseName = originalName.replace(/\.[^/.]+$/, "");
+        const newName = `${baseName}_cropped.jpg`;
+        
+        if (dom.imgPreview.src && dom.imgPreview.src.startsWith('blob:')) {
+            URL.revokeObjectURL(dom.imgPreview.src);
+        }
+        
+        selectedImageFile = new File([blob], newName, {
+            type: 'image/jpeg',
+            lastModified: new Date()
+        });
+        
+        const objectUrl = URL.createObjectURL(selectedImageFile);
         dom.imgPreview.src = objectUrl;
+        
         dom.dropzonePlaceholder.classList.add('hidden');
         dom.dropzoneLoader.classList.add('hidden');
         dom.dropzonePreview.classList.remove('hidden');
         dom.inputFileImage.required = false;
-    }
+        
+        closeCropperModal();
+    }, 'image/jpeg', 0.85);
 }
 
 function resetImagePreview() {
