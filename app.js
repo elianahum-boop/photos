@@ -443,6 +443,13 @@ function resetImagePreview() {
     dom.inputFileImage.required = true;
 }
 
+// --- פונקציה לייצור נתיב אחסון בטוח (ASCII בלבד) עבור קטגוריות בעברית ---
+function getSafeStoragePath(str) {
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(str);
+    return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 // --- דחיסת תמונה מקומית למצב דמו (כדי שלא יפוצץ את ה-LocalStorage) ---
 function compressImageForLocal(file) {
     return new Promise((resolve, reject) => {
@@ -527,7 +534,8 @@ async function handleObservationSubmit(e) {
                 // העלאת הקובץ החדש ל-Storage
                 const fileExt = file.name.split('.').pop() || 'jpg';
                 const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
-                const filePath = `${category}/${fileName}`;
+                const safeCategory = getSafeStoragePath(category);
+                const filePath = `${safeCategory}/${fileName}`;
                 
                 const { data: uploadData, error: uploadError } = await supabaseClient.storage
                     .from(STORAGE_BUCKET_NAME)
