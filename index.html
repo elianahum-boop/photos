@@ -253,7 +253,7 @@
                                 </button>
                             </div>
                             <pre class="sql-code" id="sql-setup-code">
--- 1. יצירת טבלת תצפיות
+-- 1. יצירת טבלת תצפיות וביטול אבטחת שורות (RLS) כדי לאפשר שמירה ללא הרשמה
 create table if not exists public.observations (
   id uuid default gen_random_uuid() primary key,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
@@ -264,8 +264,14 @@ create table if not exists public.observations (
   image_url text not null
 );
 
--- 2. יצירת באקט לאחסון תמונות
--- הערה: יש לוודא שה-Bucket בשם 'insects' קיים ב-Storage של Supabase ומוגדר כ-Public.
+alter table public.observations disable row level security;
+
+-- 2. יצירת הרשאות העלאה ומחיקה של תמונות בבאקט insects
+-- יש לוודא תחילה שהקמת באקט בשם insects ב-Storage והגדרת אותו כ-Public.
+-- לאחר מכן הריצי את השורות הבאות כדי לאפשר העלאה ומחיקה של תמונות מהאתר:
+create policy "Allow public select" on storage.objects for select using (bucket_id = 'insects');
+create policy "Allow public insert" on storage.objects for insert with check (bucket_id = 'insects');
+create policy "Allow public delete" on storage.objects for delete using (bucket_id = 'insects');
 </pre>
                         </div>
                     </div>
