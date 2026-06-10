@@ -724,7 +724,7 @@ async function handleObservationSubmit(e) {
     
     // בדיקת תמונה חובה: אם אין קובץ חדש ואין תמונה קיימת בתצוגה המקדימה
     if (!file && !dom.imgPreview.src) {
-        alert("נא לבחור תמונת חרק.");
+        alert("נא לבחור תמונה לתצפית.");
         return;
     }
     

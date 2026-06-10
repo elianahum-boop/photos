@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>אלבום חרקים דיגיטלי - מעקב ותיעוד מהשדה</title>
-    <meta name="description" content="אלבום דיגיטלי אישי לתיעוד, ארגון ושמירה של תצפיות חרקים בענן כולל חלוקה לתיקיות ופרטי מיקום.">
+    <title>NatureDex - אלבום תצפיות טבע דיגיטלי</title>
+    <meta name="description" content="אלבום דיגיטלי אישי לתיעוד, ארגון ושמירה של תצפיות טבע בענן כולל חלוקה לתיקיות ופרטי מיקום.">
     
     <!-- Google Fonts: Rubik for Hebrew, Outfit for numbers & branding -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,11 +40,11 @@
         <div class="header-container">
             <div class="header-brand">
                 <div class="brand-logo" id="brand-logo-container">
-                    <i data-lucide="bug" class="logo-icon"></i>
+                    <i data-lucide="leaf" class="logo-icon"></i>
                 </div>
                 <div class="brand-text">
-                    <h1 class="app-title" id="main-app-title">BugDex</h1>
-                    <span class="app-subtitle">אלבום תצפיות חרקים דיגיטלי</span>
+                    <h1 class="app-title" id="main-app-title">NatureDex</h1>
+                    <span class="app-subtitle">אלבום תצפיות טבע דיגיטלי</span>
                 </div>
             </div>
             
@@ -89,16 +89,16 @@
 
             <form class="observation-form" id="form-add-observation" autocomplete="off">
                 <div class="form-grid">
-                    <!-- פרטי החרק -->
+                    <!-- פרטי התצפית -->
                     <div class="form-group">
-                        <label for="input-bug-name" class="form-label">שם החרק *</label>
-                        <input type="text" id="input-bug-name" class="form-input" placeholder="לדוגמה: פרפר זנב סנונית" required>
+                        <label for="input-bug-name" class="form-label">שם בעל החיים / הממצא *</label>
+                        <input type="text" id="input-bug-name" class="form-input" placeholder="לדוגמה: פרפר זנב סנונית, סיקסק, צבי ארץ-ישראלי" required>
                     </div>
 
                     <div class="form-group">
                         <label for="input-bug-category" class="form-label">משפחה / קבוצה *</label>
                         <div class="select-wrapper">
-                            <input type="text" id="input-bug-category" class="form-input" placeholder="בחר או הקלד משפחה (לדוגמה: פרפרים, חיפושיות)" list="categories-list" required>
+                            <input type="text" id="input-bug-category" class="form-input" placeholder="בחר או הקלד קבוצה (לדוגמה: פרפרים, ציפורים, יונקים)" list="categories-list" required>
                             <datalist id="categories-list"></datalist>
                         </div>
                     </div>
@@ -119,7 +119,7 @@
 
                 <!-- אזור העלאת תמונה -->
                 <div class="image-upload-wrapper">
-                    <label class="form-label">תמונת החרק *</label>
+                    <label class="form-label">תמונת התצפית *</label>
                     <div class="image-dropzone" id="dropzone-image">
                         <input type="file" id="input-file-image" accept="image/*" class="hidden-file-input" required>
                         <div class="dropzone-placeholder" id="dropzone-placeholder-content">
@@ -158,7 +158,7 @@
             <div class="controls-search-row">
                 <div class="search-input-container">
                     <i data-lucide="search" class="search-icon"></i>
-                    <input type="text" id="input-search-gallery" class="search-input" placeholder="חיפוש חרק, מיקום או הערות...">
+                    <input type="text" id="input-search-gallery" class="search-input" placeholder="חיפוש תצפית, בעל חיים, מיקום...">
                 </div>
                 <div class="gallery-stats" id="gallery-stats-text">
                     טוען תצפיות...
@@ -167,7 +167,7 @@
             
             <!-- פילטר קטגוריות / תיקיות דינמי -->
             <div class="categories-filter-bar">
-                <span class="filter-label">משפחות:</span>
+                <span class="filter-label">קבוצות:</span>
                 <div class="filter-tabs-container" id="container-category-filters">
                     <!-- ייווצר דינמית ב-JS -->
                     <button class="filter-tab active" data-category="all">הכל</button>
@@ -180,7 +180,7 @@
             <!-- רכיבי הגלריה והתיקיות ייווצרו דינמית -->
             <div class="loading-state-indicator" id="gallery-loading-indicator">
                 <div class="spinner"></div>
-                <p>טוען את אלבום החרקים שלך...</p>
+                <p>טוען את אלבום התצפיות שלך...</p>
             </div>
         </section>
 
@@ -202,8 +202,8 @@
     <!-- פוטר -->
     <footer class="app-footer">
         <div class="footer-container container">
-            <p class="footer-copy">© <span id="span-current-year">2026</span> BugDex. כל הזכויות שמורות.</p>
-            <p class="footer-credit">מערכת תיעוד חרקים דיגיטלית בענן</p>
+            <p class="footer-copy">© <span id="span-current-year">2026</span> NatureDex. כל הזכויות שמורות.</p>
+            <p class="footer-credit">מערכת תיעוד תצפיות טבע בענן</p>
         </div>
     </footer>
 
@@ -315,14 +315,14 @@ using ( bucket_id = 'album' );</pre>
             <div class="lightbox-layout">
                 <!-- צד התמונה -->
                 <div class="lightbox-media-wrapper">
-                    <img src="" alt="תמונת חרק מוגדלת" class="lightbox-image" id="lightbox-main-img">
+                    <img src="" alt="תמונת תצפית מוגדלת" class="lightbox-image" id="lightbox-main-img">
                 </div>
                 
                 <!-- צד המידע -->
                 <div class="lightbox-info-panel">
                     <div class="lightbox-info-header">
                         <span class="lightbox-badge" id="lightbox-badge-category">פרפרים</span>
-                        <h3 class="lightbox-title" id="lightbox-bug-name">שם החרק</h3>
+                        <h3 class="lightbox-title" id="lightbox-bug-name">שם בעל החיים / הממצא</h3>
                         <p class="lightbox-date" id="lightbox-observation-date">תאריך תצפית: 10/06/2026</p>
                     </div>
                     
