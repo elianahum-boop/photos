@@ -1,0 +1,1438 @@
+/* ==========================================================================
+   BugDex - Custom CSS Style Sheets (Nature Dark Mode Design System)
+   ========================================================================== */
+
+/* אתחול והגדרות בסיסיות */
+:root {
+    --bg-base: #06090e;
+    --bg-surface: #0c121c;
+    --bg-surface-elevated: #131d2d;
+    
+    --color-green: #10b981;
+    --color-green-light: #34d399;
+    --color-green-dark: #059669;
+    --color-green-glow: rgba(16, 185, 129, 0.15);
+    
+    --color-brown: #a27b5c;
+    --color-brown-light: #dcd7c9;
+    --color-brown-dark: #3f2e21;
+    
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --text-dark: #4b5563;
+    
+    --border-glass: rgba(255, 255, 255, 0.06);
+    --border-glass-active: rgba(16, 185, 129, 0.3);
+    
+    --shadow-soft: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+    --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.2);
+    
+    --font-family: 'Rubik', 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    --border-radius-lg: 20px;
+    --border-radius-md: 12px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-base);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* כיווניות ויישור עברית */
+body.nature-dark-theme {
+    direction: rtl;
+    text-align: right;
+}
+
+.ltr-input {
+    direction: ltr;
+    text-align: left;
+}
+
+.container {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* ==========================================================================
+   רקע דקורטיבי דינמי
+   ========================================================================== */
+.background-decorations {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.12;
+    mix-blend-mode: screen;
+}
+
+.blob-1 {
+    top: -10%;
+    right: 10%;
+    width: 600px;
+    height: 600px;
+    background-color: var(--color-green);
+    animation: floatBlob 20s infinite alternate ease-in-out;
+}
+
+.blob-2 {
+    bottom: -10%;
+    left: 10%;
+    width: 500px;
+    height: 500px;
+    background-color: #3b82f6; /* כחול טבעי עמוק */
+    animation: floatBlob 25s infinite alternate-reverse ease-in-out;
+}
+
+@keyframes floatBlob {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(80px, 50px) scale(1.15); }
+}
+
+/* ==========================================================================
+   כותרת ראשית (Header)
+   ========================================================================== */
+.main-header {
+    background: rgba(12, 18, 28, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-glass);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.brand-logo {
+    width: 46px;
+    height: 46px;
+    background: linear-gradient(135deg, var(--color-green) 0%, var(--color-green-dark) 100%);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-glow);
+}
+
+.logo-icon {
+    width: 24px;
+    height: 24px;
+    color: #ffffff;
+}
+
+.app-title {
+    font-family: 'Outfit', 'Rubik', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+    line-height: 1.1;
+}
+
+.app-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ==========================================================================
+   כפתורים ופקדים
+   ========================================================================== */
+.btn, .icon-button {
+    font-family: var(--font-family);
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    outline: none;
+    transition: var(--transition-smooth);
+}
+
+.icon-button {
+    padding: 10px 18px;
+    border-radius: var(--border-radius-md);
+    background-color: var(--color-green);
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.icon-button.secondary {
+    background-color: var(--bg-surface-elevated);
+    border: 1px solid var(--border-glass);
+    color: var(--text-main);
+    padding: 10px;
+    aspect-ratio: 1;
+}
+
+.icon-button.secondary:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.icon-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.icon-button:active {
+    transform: translateY(0);
+}
+
+.glow-effect {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
+
+.glow-effect:hover {
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: var(--border-radius-md);
+    font-size: 14px;
+}
+
+.btn.primary {
+    background: linear-gradient(90deg, var(--color-green) 0%, var(--color-green-dark) 100%);
+    color: #ffffff;
+}
+
+.btn.primary:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+.btn.secondary {
+    background-color: transparent;
+    border: 1px solid var(--border-glass);
+    color: var(--text-main);
+}
+
+.btn.secondary:hover {
+    background-color: var(--border-glass);
+}
+
+.btn.danger {
+    background-color: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+}
+
+.btn.danger:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   פאנל התראות ומצבים
+   ========================================================================== */
+.system-status-bar {
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-badge.demo-active {
+    background-color: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fbbf24;
+}
+
+.status-badge.demo-active .badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #f59e0b;
+    animation: pulse 1.5s infinite;
+}
+
+.status-badge.cloud-active {
+    background-color: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #34d399;
+}
+
+.status-badge.cloud-active .badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--color-green);
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.9); opacity: 0.6; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(0.9); opacity: 0.6; }
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================================================
+   פאנל זכוכית (Glass Panel)
+   ========================================================================== */
+.glass-panel {
+    background: rgba(12, 18, 28, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: 24px;
+    transition: var(--transition-smooth);
+}
+
+/* ==========================================================================
+   טופס הוספת תצפית
+   ========================================================================== */
+.upload-section {
+    margin-top: 12px;
+    margin-bottom: 24px;
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-glass);
+    padding-bottom: 16px;
+}
+
+.panel-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.panel-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.panel-title {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.close-panel-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    transition: var(--transition-smooth);
+}
+
+.close-panel-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+}
+
+.observation-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+@media (min-width: 768px) {
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.form-input, .form-textarea {
+    width: 100%;
+    background-color: rgba(6, 9, 14, 0.6);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--border-radius-md);
+    color: #ffffff;
+    padding: 12px 16px;
+    font-family: var(--font-family);
+    font-size: 14px;
+    outline: none;
+    transition: var(--transition-smooth);
+}
+
+.form-input:focus, .form-textarea:focus {
+    border-color: var(--color-green);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.1);
+    background-color: rgba(6, 9, 14, 0.9);
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-inner-icon {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.form-input.with-icon {
+    padding-right: 44px;
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+/* אזור העלאת תמונה */
+.image-upload-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.image-dropzone {
+    width: 100%;
+    min-height: 180px;
+    border: 2px dashed rgba(16, 185, 129, 0.3);
+    background-color: rgba(16, 185, 129, 0.02);
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    transition: var(--transition-smooth);
+}
+
+.image-dropzone:hover {
+    border-color: var(--color-green);
+    background-color: rgba(16, 185, 129, 0.05);
+}
+
+.image-dropzone.dragover {
+    border-color: var(--color-green-light);
+    background-color: rgba(16, 185, 129, 0.1);
+}
+
+.hidden-file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.dropzone-placeholder {
+    text-align: center;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.placeholder-icon-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: rgba(16, 185, 129, 0.08);
+    color: var(--color-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.placeholder-icon-circle i {
+    width: 24px;
+    height: 24px;
+}
+
+.placeholder-text-main {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.placeholder-text-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.dropzone-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-base);
+}
+
+.preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.btn-remove-preview {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: rgba(239, 68, 68, 0.85);
+    border: none;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 15;
+    transition: var(--transition-smooth);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.btn-remove-preview:hover {
+    transform: scale(1.1);
+    background-color: #ef4444;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+/* ==========================================================================
+   סרגל סינון וחיפוש
+   ========================================================================== */
+.gallery-controls {
+    margin-bottom: 24px;
+}
+
+.controls-search-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+@media (min-width: 768px) {
+    .controls-search-row {
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+.search-input-container {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+}
+
+.search-icon {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: var(--text-muted);
+}
+
+.search-input {
+    width: 100%;
+    background-color: rgba(6, 9, 14, 0.5);
+    border: 1px solid var(--border-glass);
+    border-radius: 100px;
+    color: #ffffff;
+    padding: 12px 48px 12px 16px;
+    outline: none;
+    font-family: var(--font-family);
+    font-size: 14px;
+    transition: var(--transition-smooth);
+}
+
+.search-input:focus {
+    border-color: var(--color-green);
+    background-color: rgba(6, 9, 14, 0.8);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.1);
+}
+
+.gallery-stats {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.categories-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow: hidden;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-glass);
+}
+
+.filter-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.filter-tabs-container {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    width: 100%;
+    padding-bottom: 4px;
+}
+
+/* Custom Scrollbar for horizontal tabs */
+.filter-tabs-container::-webkit-scrollbar {
+    height: 4px;
+}
+.filter-tabs-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+.filter-tabs-container::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+}
+
+.filter-tab {
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-glass);
+    color: var(--text-muted);
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.filter-tab:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.filter-tab.active {
+    background-color: rgba(16, 185, 129, 0.12);
+    border-color: var(--border-glass-active);
+    color: var(--color-green-light);
+}
+
+/* ==========================================================================
+   גלריית האלבום (חלוקה לתיקיות)
+   ========================================================================== */
+.album-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    margin-bottom: 48px;
+}
+
+/* תיקיית חרקים מורחבת */
+.folder-container {
+    background: rgba(12, 18, 28, 0.3);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    transition: var(--transition-smooth);
+}
+
+.folder-header {
+    background: rgba(19, 29, 45, 0.4);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-glass);
+    user-select: none;
+    transition: var(--transition-smooth);
+}
+
+.folder-header:hover {
+    background: rgba(19, 29, 45, 0.7);
+}
+
+.folder-title-block {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.folder-icon {
+    color: var(--color-green);
+    width: 24px;
+    height: 24px;
+}
+
+.folder-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.folder-badge-count {
+    font-size: 11px;
+    font-weight: 700;
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--color-green-light);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    padding: 3px 8px;
+    border-radius: 100px;
+}
+
+.folder-toggle-icon {
+    color: var(--text-muted);
+    transition: var(--transition-smooth);
+}
+
+.folder-container.collapsed .folder-toggle-icon {
+    transform: rotate(180deg);
+}
+
+.folder-container.collapsed {
+    border-bottom-width: 1px;
+}
+
+.folder-content {
+    padding: 24px;
+    transition: max-height 0.4s ease-out;
+}
+
+.folder-container.collapsed .folder-content {
+    display: none;
+}
+
+/* גריד התמונות בתוך תיקייה */
+.folder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+/* כרטיסיית חרק */
+.bug-card {
+    background: rgba(19, 29, 45, 0.5);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    position: relative;
+    aspect-ratio: 4/5;
+}
+
+.bug-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.bug-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    border-color: rgba(16, 185, 129, 0.25);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+}
+
+.bug-card-media {
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
+    background-color: #06090e;
+}
+
+.bug-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition-smooth);
+}
+
+.bug-card:hover .bug-card-img {
+    transform: scale(1.06);
+}
+
+.bug-card-details {
+    padding: 14px 16px;
+    background: linear-gradient(to top, rgba(12, 18, 28, 0.95) 0%, rgba(12, 18, 28, 0.7) 100%);
+    border-top: 1px solid var(--border-glass);
+    backdrop-filter: blur(8px);
+}
+
+.bug-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bug-card-location-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.bug-card-location-row i {
+    width: 12px;
+    height: 12px;
+    color: var(--color-green);
+    flex-shrink: 0;
+}
+
+.bug-card-location-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   מצבי טעינה, ריק ותקינות
+   ========================================================================== */
+.loading-state-indicator {
+    text-align: center;
+    padding: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    color: var(--text-muted);
+}
+
+.spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(16, 185, 129, 0.1);
+    border-top: 3px solid var(--color-green);
+    border-radius: 50%;
+    animation: spin 1s infinite linear;
+}
+
+.spinner.large {
+    width: 48px;
+    height: 48px;
+    border-width: 4px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.empty-state-container {
+    text-align: center;
+    padding: 64px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 48px;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.empty-state-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: rgba(16, 185, 129, 0.08);
+    color: var(--color-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.empty-state-icon i {
+    width: 32px;
+    height: 32px;
+}
+
+.empty-state-title {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.empty-state-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    max-width: 360px;
+    margin-bottom: 8px;
+}
+
+/* ==========================================================================
+   מודלים ומסכים צפים (Modals)
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    transition: var(--transition-smooth);
+}
+
+.modal-container {
+    width: 100%;
+    max-width: 580px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-color: rgba(255, 255, 255, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-glass);
+    padding-bottom: 16px;
+}
+
+.modal-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.modal-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.close-modal-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    transition: var(--transition-smooth);
+}
+
+.close-modal-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modal-instruction {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.input-password-wrapper {
+    position: relative;
+}
+
+.btn-toggle-password {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+}
+
+.btn-toggle-password:hover {
+    color: #ffffff;
+}
+
+.eye-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 12px;
+    border-top: 1px solid var(--border-glass);
+    padding-top: 16px;
+}
+
+/* מדריך להגדרות */
+.setup-guide-box {
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--border-radius-md);
+    padding: 16px;
+}
+
+.guide-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-green-light);
+}
+
+.guide-title i {
+    width: 16px;
+    height: 16px;
+}
+
+.guide-steps {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-right: 18px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sql-code-box {
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border-glass);
+}
+
+.sql-code-header {
+    background-color: rgba(255,255,255,0.03);
+    padding: 8px 12px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-glass);
+    font-weight: 600;
+}
+
+.btn-copy-code {
+    background: transparent;
+    border: none;
+    color: var(--color-green-light);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-family);
+}
+
+.btn-copy-code:hover {
+    text-decoration: underline;
+}
+
+.copy-icon {
+    width: 12px;
+    height: 12px;
+}
+
+.sql-code {
+    background-color: #04060a;
+    padding: 12px;
+    font-family: monospace;
+    font-size: 10px;
+    color: #e5e7eb;
+    overflow-x: auto;
+    direction: ltr;
+    text-align: left;
+    max-height: 120px;
+}
+
+/* אנימציות */
+.animate-scale-up {
+    animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scaleUp {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* ==========================================================================
+   מודל לייטבוקס (Lightbox)
+   ========================================================================== */
+.lightbox-container {
+    width: 100%;
+    max-width: 960px;
+    background: rgba(12, 18, 28, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+.lightbox-close-btn {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 100;
+    transition: var(--transition-smooth);
+}
+
+.lightbox-close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: scale(1.05);
+}
+
+.lightbox-layout {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (min-width: 768px) {
+    .lightbox-layout {
+        flex-direction: row;
+        height: 600px;
+    }
+}
+
+.lightbox-media-wrapper {
+    flex-grow: 1;
+    background-color: #040609;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    min-height: 300px;
+}
+
+.lightbox-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.lightbox-info-panel {
+    width: 100%;
+    background-color: var(--bg-surface);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-top: 1px solid var(--border-glass);
+}
+
+@media (min-width: 768px) {
+    .lightbox-info-panel {
+        width: 380px;
+        min-width: 380px;
+        border-top: none;
+        border-right: 1px solid var(--border-glass);
+    }
+}
+
+.lightbox-info-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.lightbox-badge {
+    align-self: flex-start;
+    font-size: 11px;
+    font-weight: 700;
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--color-green-light);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    padding: 4px 10px;
+    border-radius: 100px;
+}
+
+.lightbox-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.lightbox-date {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.lightbox-info-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex-grow: 1;
+}
+
+.info-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.info-field-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.info-field-label i {
+    width: 14px;
+    height: 14px;
+    color: var(--color-green);
+}
+
+.info-field-value {
+    font-size: 14px;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.info-field-value.notes-text {
+    font-size: 13px;
+    color: #e5e7eb;
+    background-color: rgba(6, 9, 14, 0.4);
+    padding: 12px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-glass);
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.lightbox-info-footer {
+    margin-top: 24px;
+    border-top: 1px solid var(--border-glass);
+    padding-top: 20px;
+}
+
+/* ==========================================================================
+   מסך התקדמות העלאה
+   ========================================================================== */
+.upload-progress-panel {
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 40px;
+}
+
+.progress-spinner-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.uploading-inner-icon {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    color: var(--color-green);
+    animation: bounce 1.5s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+.progress-title {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.progress-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   פוטר (Footer)
+   ========================================================================== */
+.app-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--border-glass);
+    background-color: var(--bg-surface);
+    padding: 24px 0;
+}
+
+.footer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+@media (min-width: 768px) {
+    .footer-container {
+        flex-direction: row;
+    }
+}
+
+.footer-copy {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.footer-credit {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dark);
+}

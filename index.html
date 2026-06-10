@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אלבום חרקים דיגיטלי - מעקב ותיעוד מהשדה</title>
+    <meta name="description" content="אלבום דיגיטלי אישי לתיעוד, ארגון ושמירה של תצפיות חרקים בענן כולל חלוקה לתיקיות ופרטי מיקום.">
+    
+    <!-- Google Fonts: Rubik for Hebrew, Outfit for numbers & branding -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=Rubik:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Supabase JS Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="nature-dark-theme">
+
+    <!-- רקע דינמי עדין -->
+    <div class="background-decorations" aria-hidden="true">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <!-- כותרת ראשית (Header) -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <div class="brand-logo" id="brand-logo-container">
+                    <i data-lucide="bug" class="logo-icon"></i>
+                </div>
+                <div class="brand-text">
+                    <h1 class="app-title" id="main-app-title">BugDex</h1>
+                    <span class="app-subtitle">אלבום תצפיות חרקים דיגיטלי</span>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <button class="icon-button glow-effect" id="btn-toggle-upload" title="תיעוד חדש">
+                    <i data-lucide="plus" class="btn-icon"></i>
+                    <span class="btn-label">תצפית חדשה</span>
+                </button>
+                <button class="icon-button secondary" id="btn-open-settings" title="הגדרות חיבור ענן">
+                    <i data-lucide="settings" class="btn-icon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- פאנל התראות ומצבים -->
+    <div class="system-status-bar container">
+        <div class="status-badge demo-active" id="badge-demo-mode">
+            <span class="badge-dot"></span>
+            <span class="badge-text">מצב דמו (שמירה מקומית) - הגדר חיבור לענן לשמירה קבועה</span>
+        </div>
+        <div class="status-badge cloud-active hidden" id="badge-cloud-mode">
+            <span class="badge-dot"></span>
+            <span class="badge-text">מחובר לענן Supabase</span>
+        </div>
+    </div>
+
+    <!-- גוף העמוד (Main Content) -->
+    <main class="main-content container">
+        
+        <!-- אזור טופס העלאה / הוספת תצפית (נסתר כברירת מחדל, נפתח בלחיצה) -->
+        <section class="upload-section glass-panel hidden" id="section-upload-form">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <i data-lucide="camera" class="panel-icon text-green"></i>
+                    <h2 class="panel-title">תיעוד תצפית חדשה</h2>
+                </div>
+                <button class="close-panel-btn" id="btn-close-upload" aria-label="סגור טופס">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <form class="observation-form" id="form-add-observation" autocomplete="off">
+                <div class="form-grid">
+                    <!-- פרטי החרק -->
+                    <div class="form-group">
+                        <label for="input-bug-name" class="form-label">שם החרק *</label>
+                        <input type="text" id="input-bug-name" class="form-input" placeholder="לדוגמה: פרפר זנב סנונית" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-bug-category" class="form-label">משפחה / קבוצה *</label>
+                        <div class="select-wrapper">
+                            <input type="text" id="input-bug-category" class="form-input" placeholder="בחר או הקלד משפחה (לדוגמה: פרפרים, חיפושיות)" list="categories-list" required>
+                            <datalist id="categories-list"></datalist>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-observation-location" class="form-label">מקום הצילום *</label>
+                        <div class="input-with-icon">
+                            <i data-lucide="map-pin" class="input-inner-icon"></i>
+                            <input type="text" id="input-observation-location" class="form-input with-icon" placeholder="לדוגמה: הר הכרמל, יער בן שמן" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-observation-notes" class="form-label">הערות / מידע נוסף</label>
+                        <textarea id="input-observation-notes" class="form-textarea" rows="2" placeholder="פרטים מעניינים על ההתנהגות, תאריך או מזג האוויר..."></textarea>
+                    </div>
+                </div>
+
+                <!-- אזור העלאת תמונה -->
+                <div class="image-upload-wrapper">
+                    <label class="form-label">תמונת החרק *</label>
+                    <div class="image-dropzone" id="dropzone-image">
+                        <input type="file" id="input-file-image" accept="image/*" class="hidden-file-input" required>
+                        <div class="dropzone-placeholder" id="dropzone-placeholder-content">
+                            <div class="placeholder-icon-circle">
+                                <i data-lucide="image-plus"></i>
+                            </div>
+                            <p class="placeholder-text-main">גרור לכאן תמונה או לחץ לבחירה</p>
+                            <p class="placeholder-text-sub">קבצי JPG, PNG או WEBP עד 8MB</p>
+                        </div>
+                        <div class="dropzone-preview hidden" id="dropzone-preview-container">
+                            <img src="" alt="תצוגה מקדימה" class="preview-image" id="img-upload-preview">
+                            <button type="button" class="btn-remove-preview" id="btn-remove-image-file" title="הסר תמונה">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn secondary" id="btn-cancel-upload">ביטול</button>
+                    <button type="submit" class="btn primary glow-effect" id="btn-submit-observation">
+                        <i data-lucide="upload-cloud" class="btn-icon"></i>
+                        <span>העלה לענן ושמור</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- סרגל סינון, חיפוש וסיכום -->
+        <section class="gallery-controls glass-panel">
+            <div class="controls-search-row">
+                <div class="search-input-container">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" id="input-search-gallery" class="search-input" placeholder="חיפוש חרק, מיקום או הערות...">
+                </div>
+                <div class="gallery-stats" id="gallery-stats-text">
+                    טוען תצפיות...
+                </div>
+            </div>
+            
+            <!-- פילטר קטגוריות / תיקיות דינמי -->
+            <div class="categories-filter-bar">
+                <span class="filter-label">משפחות:</span>
+                <div class="filter-tabs-container" id="container-category-filters">
+                    <!-- ייווצר דינמית ב-JS -->
+                    <button class="filter-tab active" data-category="all">הכל</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- גלריית האלבום מחולקת לתיקיות -->
+        <section class="album-gallery" id="album-gallery-container">
+            <!-- רכיבי הגלריה והתיקיות ייווצרו דינמית -->
+            <div class="loading-state-indicator" id="gallery-loading-indicator">
+                <div class="spinner"></div>
+                <p>טוען את אלבום החרקים שלך...</p>
+            </div>
+        </section>
+
+        <!-- מצב ריק (Empty State) -->
+        <section class="empty-state-container glass-panel hidden" id="section-empty-state">
+            <div class="empty-state-icon">
+                <i data-lucide="info"></i>
+            </div>
+            <h3 class="empty-state-title">אין עדיין תצפיות באלבום</h3>
+            <p class="empty-state-desc">לחץ על כפתור "תצפית חדשה" כדי להעלות את התיעוד הראשון שלך לענן!</p>
+            <button class="btn primary glow-effect" id="btn-empty-state-add">
+                <i data-lucide="plus" class="btn-icon"></i>
+                <span>הוסף תצפית ראשונה</span>
+            </button>
+        </section>
+
+    </main>
+
+    <!-- פוטר -->
+    <footer class="app-footer">
+        <div class="footer-container container">
+            <p class="footer-copy">© <span id="span-current-year">2026</span> BugDex. כל הזכויות שמורות.</p>
+            <p class="footer-credit">מערכת תיעוד חרקים דיגיטלית בענן</p>
+        </div>
+    </footer>
+
+    <!-- ================= מודלים ומסכים צפים (Modals) ================= -->
+
+    <!-- 1. מודל הגדרות חיבור Supabase -->
+    <div class="modal-overlay hidden" id="modal-settings-overlay">
+        <div class="modal-container glass-panel animate-scale-up">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <i data-lucide="cloud" class="modal-icon text-green"></i>
+                    <h3 class="modal-title">הגדרות חיבור לענן (Supabase)</h3>
+                </div>
+                <button class="close-modal-btn" id="btn-close-settings" aria-label="סגור הגדרות">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <p class="modal-instruction">הזן את פרטי הפרויקט שלך ב-Supabase כדי לסנכרן את התמונות והמידע לענן האישי שלך, המאפשר גישה מכל מקום ובקבוצות נפרדות.</p>
+                
+                <form id="form-cloud-settings" class="modal-form">
+                    <div class="form-group">
+                        <label for="input-supabase-url" class="form-label">כתובת ה-Project URL</label>
+                        <input type="url" id="input-supabase-url" class="form-input ltr-input" placeholder="https://xxxxxx.supabase.co" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="input-supabase-key" class="form-label">מפתח ה-API Key (Anon Public)</label>
+                        <div class="input-password-wrapper">
+                            <input type="password" id="input-supabase-key" class="form-input ltr-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." required>
+                            <button type="button" class="btn-toggle-password" id="btn-toggle-key-visibility" title="הצג/הסתר מפתח">
+                                <i data-lucide="eye" class="eye-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="setup-guide-box">
+                        <h4 class="guide-title"><i data-lucide="help-circle"></i> איך מגדירים את זה ב-2 דקות?</h4>
+                        <ol class="guide-steps">
+                            <li>פתח פרויקט חינם ב-<strong><a href="https://supabase.com" target="_blank" class="text-green underline">Supabase</a></strong>.</li>
+                            <li>בסיום ההקמה, העתק את ה-<strong>Project URL</strong> וה-<strong>Anon Key</strong> מדף הבית של הפרויקט.</li>
+                            <li>לחץ על הלחצן למטה כדי להריץ את סקריפט ה-SQL ליצירת הטבלה והאחסון בתוך ה-<strong>SQL Editor</strong> שלהם.</li>
+                        </ol>
+                        <div class="sql-code-box">
+                            <div class="sql-code-header">
+                                <span>SQL Setup Script</span>
+                                <button type="button" class="btn-copy-code" id="btn-copy-sql">
+                                    <i data-lucide="copy" class="copy-icon"></i>
+                                    <span>העתק קוד</span>
+                                </button>
+                            </div>
+                            <pre class="sql-code" id="sql-setup-code">
+-- 1. יצירת טבלת תצפיות
+create table if not exists public.observations (
+  id uuid default gen_random_uuid() primary key,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  name text not null,
+  category text not null,
+  location text not null,
+  notes text,
+  image_url text not null
+);
+
+-- 2. יצירת באקט לאחסון תמונות
+-- הערה: יש לוודא שה-Bucket בשם 'insects' קיים ב-Storage של Supabase ומוגדר כ-Public.
+</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn secondary" id="btn-clear-settings">מחק הגדרות</button>
+                        <button type="submit" class="btn primary glow-effect" id="btn-save-settings">שמור והתחבר</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. מודל לייטבוקס לצפייה מפורטת בחרק -->
+    <div class="modal-overlay hidden" id="modal-lightbox-overlay">
+        <div class="lightbox-container animate-scale-up">
+            <button class="lightbox-close-btn" id="btn-close-lightbox" aria-label="סגור תצוגה">
+                <i data-lucide="x"></i>
+            </button>
+            
+            <div class="lightbox-layout">
+                <!-- צד התמונה -->
+                <div class="lightbox-media-wrapper">
+                    <img src="" alt="תמונת חרק מוגדלת" class="lightbox-image" id="lightbox-main-img">
+                </div>
+                
+                <!-- צד המידע -->
+                <div class="lightbox-info-panel">
+                    <div class="lightbox-info-header">
+                        <span class="lightbox-badge" id="lightbox-badge-category">פרפרים</span>
+                        <h3 class="lightbox-title" id="lightbox-bug-name">שם החרק</h3>
+                        <p class="lightbox-date" id="lightbox-observation-date">תאריך תצפית: 10/06/2026</p>
+                    </div>
+                    
+                    <div class="lightbox-info-body">
+                        <div class="info-field-group">
+                            <span class="info-field-label">
+                                <i data-lucide="map-pin"></i>
+                                <span>מיקום התצפית:</span>
+                            </span>
+                            <p class="info-field-value" id="lightbox-bug-location">מיקום לא ידוע</p>
+                        </div>
+                        
+                        <div class="info-field-group">
+                            <span class="info-field-label">
+                                <i data-lucide="file-text"></i>
+                                <span>הערות ותיאור:</span>
+                            </span>
+                            <p class="info-field-value notes-text" id="lightbox-bug-notes">אין הערות נוספות לתצפית זו.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="lightbox-info-footer">
+                        <button class="btn danger" id="btn-delete-observation">
+                            <i data-lucide="trash-2"></i>
+                            <span>מחק תצפית</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. מודל טעינה (מעלה קובץ לענן) -->
+    <div class="modal-overlay hidden" id="modal-uploading-overlay">
+        <div class="upload-progress-panel glass-panel">
+            <div class="progress-spinner-container">
+                <div class="spinner large"></div>
+                <i data-lucide="upload-cloud" class="uploading-inner-icon"></i>
+            </div>
+            <h4 class="progress-title">מעלה את התמונה לענן...</h4>
+            <p class="progress-desc">הקובץ נשמר ומאורגן בתיקייה הייעודית ב-Storage. אנא אל תסגור את החלון.</p>
+        </div>
+    </div>
+
+    <!-- App Logic Script -->
+    <script src="app.js"></script>
+</body>
+</html>
