@@ -5,6 +5,9 @@
 // --- תצפיות מובנות כדמו ראשוני (אם אין מידע קיים) ---
 const INITIAL_DEMO_OBSERVATIONS = [];
 
+// --- הגדרות קבועות ---
+const STORAGE_BUCKET_NAME = 'album';
+
 // --- משתני המצב הגלובליים ---
 let supabaseClient = null;
 let observations = [];
@@ -527,7 +530,7 @@ async function handleObservationSubmit(e) {
                 const filePath = `${category}/${fileName}`;
                 
                 const { data: uploadData, error: uploadError } = await supabaseClient.storage
-                    .from('insects')
+                    .from(STORAGE_BUCKET_NAME)
                     .upload(filePath, file, {
                         cacheControl: '3600',
                         upsert: false
@@ -535,13 +538,13 @@ async function handleObservationSubmit(e) {
                     
                 if (uploadError) {
                     if (uploadError.message && uploadError.message.includes("Bucket not found")) {
-                        throw new Error("תיקיית האחסון (Bucket) בשם 'insects' אינה קיימת ב-Supabase Storage. אנא צור אותה שם והגדר אותה כציבורית (Public).");
+                        throw new Error(`תיקיית האחסון (Bucket) בשם '${STORAGE_BUCKET_NAME}' אינה קיימת ב-Supabase Storage. אנא צור אותה שם והגדר אותה כציבורית (Public).`);
                     }
                     throw uploadError;
                 }
                 
                 const { data: urlData } = supabaseClient.storage
-                    .from('insects')
+                    .from(STORAGE_BUCKET_NAME)
                     .getPublicUrl(filePath);
                     
                 imageUrl = urlData.publicUrl;
@@ -898,14 +901,14 @@ async function handleDeleteObservation() {
             // נחלץ את שם הקובץ מה-URL הציבורי
             const imgUrl = currentSelectedObservation.image_url;
             
-            // ה-URL נראה בדרך כלל כך: .../storage/v1/object/public/insects/Category/filename.jpg
-            if (imgUrl.includes('/storage/v1/object/public/insects/')) {
-                const relativePath = imgUrl.split('/storage/v1/object/public/insects/')[1];
+            // ה-URL נראה בדרך כלל כך: .../storage/v1/object/public/bucket_name/Category/filename.jpg
+            if (imgUrl.includes(`/storage/v1/object/public/${STORAGE_BUCKET_NAME}/`)) {
+                const relativePath = imgUrl.split(`/storage/v1/object/public/${STORAGE_BUCKET_NAME}/`)[1];
                 if (relativePath) {
                     // מחיקת הקובץ
                     const decodedPath = decodeURIComponent(relativePath);
                     const { error: storageDeleteError } = await supabaseClient.storage
-                        .from('insects')
+                        .from(STORAGE_BUCKET_NAME)
                         .remove([decodedPath]);
                         
                     if (storageDeleteError) {

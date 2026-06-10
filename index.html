@@ -264,9 +264,9 @@ create table if not exists public.observations (
   image_url text not null
 );
 
--- 2. יצירת תיקיית האחסון (Bucket) בשם 'insects' אם אינה קיימת
+-- 2. יצירת תיקיית האחסון (Bucket) בשם 'album' אם אינה קיימת
 insert into storage.buckets (id, name, public)
-values ('insects', 'insects', true)
+values ('album', 'album', true)
 on conflict (id) do nothing;
 
 -- 3. הגדרת מדיניות אבטחה (Policies) לאחסון לאפשר העלאה, קריאה ומחיקה ציבורית
@@ -278,15 +278,15 @@ drop policy if exists "Allow public deletes" on storage.objects;
 
 create policy "Allow public uploads"
 on storage.objects for insert
-with check ( bucket_id = 'insects' );
+with check ( bucket_id = 'album' );
 
 create policy "Allow public read access"
 on storage.objects for select
-using ( bucket_id = 'insects' );
+using ( bucket_id = 'album' );
 
 create policy "Allow public deletes"
 on storage.objects for delete
-using ( bucket_id = 'insects' );</pre>
+using ( bucket_id = 'album' );</pre>
                         </div>
                     </div>
                     
