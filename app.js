@@ -11,6 +11,8 @@ let observations = [];
 let activeCategoryFilter = "all";
 let searchQuery = "";
 let currentSelectedObservation = null;
+let editingObservationId = null;
+let selectedImageFile = null;
 
 // --- אלמנטים מה-DOM ---
 const dom = {
@@ -46,6 +48,7 @@ const dom = {
     dropzone: document.getElementById('dropzone-image'),
     inputFileImage: document.getElementById('input-file-image'),
     dropzonePlaceholder: document.getElementById('dropzone-placeholder-content'),
+    dropzoneLoader: document.getElementById('dropzone-loader-content'),
     dropzonePreview: document.getElementById('dropzone-preview-container'),
     imgPreview: document.getElementById('img-upload-preview'),
     btnRemovePreview: document.getElementById('btn-remove-image-file'),
@@ -69,6 +72,7 @@ const dom = {
     lightboxLocation: document.getElementById('lightbox-bug-location'),
     lightboxNotes: document.getElementById('lightbox-bug-notes'),
     btnDeleteObservation: document.getElementById('btn-delete-observation'),
+    btnEditObservation: document.getElementById('btn-edit-observation'),
     
     // מסך התקדמות
     modalUploading: document.getElementById('modal-uploading-overlay')
@@ -150,6 +154,7 @@ function registerEventListeners() {
         if (e.target === dom.modalLightbox) closeLightboxModal();
     });
     dom.btnDeleteObservation.addEventListener('click', handleDeleteObservation);
+    dom.btnEditObservation.addEventListener('click', handleEditObservationClick);
     
     // תמיכה במקש Escape לסגירת מודלים
     window.addEventListener('keydown', (e) => {
@@ -310,8 +315,10 @@ function initImageUploadDropzone() {
     const fileInput = dom.inputFileImage;
     
     // לחיצה על אזור הגרירה
-    dropzone.addEventListener('click', () => {
-        fileInput.click();
+    dropzone.addEventListener('click', (e) => {
+        if (e.target !== fileInput && !e.target.closest('#btn-remove-image-file')) {
+            fileInput.click();
+        }
     });
     
     // גרירה מעל האזור
@@ -349,9 +356,16 @@ function initImageUploadDropzone() {
     });
 }
 
-function handleSelectedImageFile(file) {
-    if (!file.type.startsWith('image/')) {
-        alert("אנא בחר קובץ תמונה תקין בלבד (PNG, JPG, WEBP).");
+async function handleSelectedImageFile(file) {
+    // בדיקה מקלה - סוג קובץ או סיומת (עוזר מאוד במובייל עם קבצי HEIC/HEIF)
+    const isHeic = (file.type && (file.type === 'image/heic' || file.type === 'image/heif')) || 
+                   /\.(heic|heif)$/i.test(file.name);
+                   
+    const isImage = isHeic || (file.type && file.type.startsWith('image/')) || 
+                    /\.(jpg|jpeg|png|webp|gif)$/i.test(file.name);
+                    
+    if (!isImage) {
+        alert("אנא בחר קובץ תמונה תקין (PNG, JPG, WEBP, HEIC).");
         return;
     }
     
@@ -361,24 +375,68 @@ function handleSelectedImageFile(file) {
         return;
     }
     
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        // הצגת תמונה מוגדלת בתצוגה מקדימה
-        dom.imgPreview.src = e.target.result;
+    // שחרור Object URL קודם למניעת דליפות זיכרון
+    if (dom.imgPreview.src && dom.imgPreview.src.startsWith('blob:')) {
+        URL.revokeObjectURL(dom.imgPreview.src);
+    }
+    
+    if (isHeic) {
+        // הצגת לואדר
+        dom.dropzonePlaceholder.classList.add('hidden');
+        dom.dropzonePreview.classList.add('hidden');
+        dom.dropzoneLoader.classList.remove('hidden');
+        
+        try {
+            if (typeof heic2any === 'undefined') {
+                throw new Error("ספריית המרת התמונות (heic2any) לא נטענה כראוי. אנא ודא שיש חיבור לרשת.");
+            }
+            
+            const convertedBlob = await heic2any({
+                blob: file,
+                toType: "image/jpeg",
+                quality: 0.8
+            });
+            
+            const blobResult = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+            const newName = file.name.replace(/\.(heic|heif)$/i, '.jpg');
+            
+            selectedImageFile = new File([blobResult], newName, {
+                type: 'image/jpeg',
+                lastModified: new Date()
+            });
+            
+            const objectUrl = URL.createObjectURL(selectedImageFile);
+            dom.imgPreview.src = objectUrl;
+            
+            dom.dropzoneLoader.classList.add('hidden');
+            dom.dropzonePreview.classList.remove('hidden');
+            dom.inputFileImage.required = false;
+            
+        } catch (error) {
+            console.error("שגיאה בהמרת קובץ HEIC:", error);
+            alert("לא ניתן היה להמיר את תמונת ה-HEIC: " + (error.message || error));
+            resetImagePreview();
+        }
+    } else {
+        selectedImageFile = file;
+        const objectUrl = URL.createObjectURL(file);
+        dom.imgPreview.src = objectUrl;
         dom.dropzonePlaceholder.classList.add('hidden');
         dom.dropzonePreview.classList.remove('hidden');
-        
-        // עדכון מאפיין הנדרש של שדה הקובץ
         dom.inputFileImage.required = false;
-    };
-    reader.readAsDataURL(file);
+    }
 }
 
 function resetImagePreview() {
+    if (dom.imgPreview.src && dom.imgPreview.src.startsWith('blob:')) {
+        URL.revokeObjectURL(dom.imgPreview.src);
+    }
     dom.imgPreview.src = "";
     dom.dropzonePreview.classList.add('hidden');
+    dom.dropzoneLoader.classList.add('hidden');
     dom.dropzonePlaceholder.classList.remove('hidden');
     dom.inputFileImage.value = "";
+    selectedImageFile = null;
     dom.inputFileImage.required = true;
 }
 
@@ -424,7 +482,7 @@ function compressImageForLocal(file) {
     });
 }
 
-// --- שליחה ושמירת תצפית חדשה ---
+// --- שליחה ושמירת תצפית חדשה (תומך גם בעריכה) ---
 async function handleObservationSubmit(e) {
     e.preventDefault();
     
@@ -434,10 +492,16 @@ async function handleObservationSubmit(e) {
     const notes = dom.inputNotes.value.trim();
     
     // קובץ התמונה שנבחר
-    const file = dom.inputFileImage.files[0];
+    const file = selectedImageFile;
     
     if (!name || !category || !location) {
         alert("נא למלא את כל שדות החובה המסומנים בכוכבית (*).");
+        return;
+    }
+    
+    // בדיקת תמונה חובה: אם אין קובץ חדש ואין תמונה קיימת בתצוגה המקדימה
+    if (!file && !dom.imgPreview.src) {
+        alert("נא לבחור תמונת חרק.");
         return;
     }
     
@@ -448,74 +512,100 @@ async function handleObservationSubmit(e) {
     try {
         let imageUrl = "";
         
+        // אם אנחנו בעריכה ומציגים תמונה קיימת (שאינה blob מקומי)
+        if (editingObservationId && !file) {
+            imageUrl = dom.imgPreview.src; // שומר על התמונה הקיימת
+        }
+        
         if (supabaseClient) {
             // === שמירה בענן עם Supabase ===
             
-            // 1. העלאת הקובץ ל-Storage של Supabase תחת תיקיית קטגוריית החרק
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
-            // נתיב מאורגן בתיקייה
-            const filePath = `${category}/${fileName}`;
-            
-            const { data: uploadData, error: uploadError } = await supabaseClient.storage
-                .from('insects')
-                .upload(filePath, file, {
-                    cacheControl: '3600',
-                    upsert: false
-                });
+            if (file) {
+                // העלאת הקובץ החדש ל-Storage
+                const fileExt = file.name.split('.').pop() || 'jpg';
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+                const filePath = `${category}/${fileName}`;
                 
-            if (uploadError) {
-                // בדיקה אם הבעיה היא שהבאקט לא קיים
-                if (uploadError.message && uploadError.message.includes("Bucket not found")) {
-                    throw new Error("תיקיית האחסון (Bucket) בשם 'insects' אינה קיימת ב-Supabase Storage שלך. אנא צור אותה שם והגדר אותה כציבורית (Public).");
+                const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                    .from('insects')
+                    .upload(filePath, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+                    
+                if (uploadError) {
+                    if (uploadError.message && uploadError.message.includes("Bucket not found")) {
+                        throw new Error("תיקיית האחסון (Bucket) בשם 'insects' אינה קיימת ב-Supabase Storage. אנא צור אותה שם והגדר אותה כציבורית (Public).");
+                    }
+                    throw uploadError;
                 }
-                throw uploadError;
+                
+                const { data: urlData } = supabaseClient.storage
+                    .from('insects')
+                    .getPublicUrl(filePath);
+                    
+                imageUrl = urlData.publicUrl;
             }
             
-            // 2. קבלת ה-Public URL של התמונה שהועלתה
-            const { data: urlData } = supabaseClient.storage
-                .from('insects')
-                .getPublicUrl(filePath);
-                
-            imageUrl = urlData.publicUrl;
-            
-            // 3. יצירת רשומה חדשה בטבלת observations
-            const { error: insertError } = await supabaseClient
-                .from('observations')
-                .insert([
-                    { name, category, location, notes, image_url: imageUrl }
-                ]);
-                
-            if (insertError) throw insertError;
+            if (editingObservationId) {
+                // עדכון רשומה קיימת
+                const { error: updateError } = await supabaseClient
+                    .from('observations')
+                    .update({ name, category, location, notes, image_url: imageUrl })
+                    .eq('id', editingObservationId);
+                    
+                if (updateError) throw updateError;
+            } else {
+                // יצירת רשומה חדשה
+                const { error: insertError } = await supabaseClient
+                    .from('observations')
+                    .insert([
+                        { name, category, location, notes, image_url: imageUrl }
+                    ]);
+                    
+                if (insertError) throw insertError;
+            }
             
         } else {
             // === שמירה מקומית במצב דמו ===
-            let localImgData = "";
             if (file) {
-                // דחיסה מקומית של התמונה ושמירת ה-base64
-                localImgData = await compressImageForLocal(file);
-            } else {
-                localImgData = "https://via.placeholder.com/600?text=No+Image";
+                imageUrl = await compressImageForLocal(file);
             }
             
-            const newObservation = {
-                id: `local-${Date.now()}`,
-                created_at: new Date().toISOString(),
-                name,
-                category,
-                location,
-                notes,
-                image_url: localImgData
-            };
-            
-            // שמירה ב-LocalStorage
             const localObs = JSON.parse(localStorage.getItem('bugdex_local_observations') || "[]");
-            localObs.unshift(newObservation);
+            
+            if (editingObservationId) {
+                // עדכון מקומי
+                const index = localObs.findIndex(obs => obs.id === editingObservationId);
+                if (index !== -1) {
+                    localObs[index].name = name;
+                    localObs[index].category = category;
+                    localObs[index].location = location;
+                    localObs[index].notes = notes;
+                    if (imageUrl) {
+                        localObs[index].image_url = imageUrl;
+                    }
+                }
+            } else {
+                // הוספה מקומית
+                const newObservation = {
+                    id: `local-${Date.now()}`,
+                    created_at: new Date().toISOString(),
+                    name,
+                    category,
+                    location,
+                    notes,
+                    image_url: imageUrl
+                };
+                localObs.unshift(newObservation);
+            }
             localStorage.setItem('bugdex_local_observations', JSON.stringify(localObs));
         }
         
         // הצלחה
-        alert(`התצפית "${name}" נשמרה בהצלחה תחת משפחת "${category}"!`);
+        const msg = editingObservationId ? "התצפית עודכנה בהצלחה!" : `התצפית "${name}" נשמרה בהצלחה תחת משפחת "${category}"!`;
+        alert(msg);
+        
         resetForm();
         hidePanel(dom.sectionUploadForm);
         
@@ -526,15 +616,22 @@ async function handleObservationSubmit(e) {
         console.error("שגיאה בשמירת התצפית:", error);
         alert(`שגיאה בשמירה: ${error.message || error}`);
     } finally {
-        // הסתרת מודל הטעינה
         dom.modalUploading.classList.add('hidden');
         dom.btnSubmitObservation.disabled = false;
     }
 }
 
 function resetForm() {
+    editingObservationId = null;
     dom.formAddObservation.reset();
     resetImagePreview();
+    
+    // החזרת כותרות הטופס לקדמותן
+    const panelTitle = dom.sectionUploadForm.querySelector('.panel-title');
+    if (panelTitle) panelTitle.innerText = "תיעוד תצפית חדשה";
+    
+    const submitBtnSpan = dom.btnSubmitObservation.querySelector('span');
+    if (submitBtnSpan) submitBtnSpan.innerText = "העלה לענן ושמור";
 }
 
 // --- טעינת נתונים (ענן / מקומי) ---
@@ -843,4 +940,41 @@ async function handleDeleteObservation() {
         dom.btnDeleteObservation.disabled = false;
         dom.btnDeleteObservation.innerHTML = originalBtnText;
     }
+}
+
+// --- פונקציית מעבר למצב עריכת תצפית ---
+function handleEditObservationClick() {
+    if (!currentSelectedObservation) return;
+    
+    const obs = currentSelectedObservation;
+    editingObservationId = obs.id;
+    
+    // סגירת הלייטבוקס
+    closeLightboxModal();
+    
+    // פתיחת פאנל ההעלאה
+    showPanel(dom.sectionUploadForm);
+    
+    // שינוי כותרת הטופס והכפתור
+    const panelTitle = dom.sectionUploadForm.querySelector('.panel-title');
+    if (panelTitle) panelTitle.innerText = `עריכת תצפית: ${obs.name}`;
+    
+    const submitBtnSpan = dom.btnSubmitObservation.querySelector('span');
+    if (submitBtnSpan) submitBtnSpan.innerText = "עדכן ושמור שינויים";
+    
+    // מילוי שדות הטופס
+    dom.inputBugName.value = obs.name || "";
+    dom.inputBugCategory.value = obs.category || "";
+    dom.inputLocation.value = obs.location || "";
+    dom.inputNotes.value = obs.notes || "";
+    
+    // מילוי התמונה בתצוגה המקדימה
+    dom.imgPreview.src = obs.image_url;
+    dom.dropzonePlaceholder.classList.add('hidden');
+    dom.dropzoneLoader.classList.add('hidden');
+    dom.dropzonePreview.classList.remove('hidden');
+    
+    // המפתח לא נדרש כעת (הוא קיים)
+    dom.inputFileImage.required = false;
+    selectedImageFile = null;
 }

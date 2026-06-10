@@ -19,6 +19,9 @@
     
     <!-- Supabase JS Client CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- HEIC/HEIF Image Conversion Library for Mobile Support -->
+    <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 </head>
 <body class="nature-dark-theme">
 
@@ -120,7 +123,12 @@
                                 <i data-lucide="image-plus"></i>
                             </div>
                             <p class="placeholder-text-main">גרור לכאן תמונה או לחץ לבחירה</p>
-                            <p class="placeholder-text-sub">קבצי JPG, PNG או WEBP עד 8MB</p>
+                            <p class="placeholder-text-sub">קבצי JPG, PNG, WEBP או HEIC עד 8MB</p>
+                        </div>
+                        <div class="dropzone-loader hidden" id="dropzone-loader-content">
+                            <div class="spinner"></div>
+                            <p class="placeholder-text-main" style="margin-top: 12px;">מעבד וממיר תמונת HEIC...</p>
+                            <p class="placeholder-text-sub">זה עשוי לקחת מספר שניות במכשיר נייד</p>
                         </div>
                         <div class="dropzone-preview hidden" id="dropzone-preview-container">
                             <img src="" alt="תצוגה מקדימה" class="preview-image" id="img-upload-preview">
@@ -311,10 +319,16 @@ create table if not exists public.observations (
                     </div>
                     
                     <div class="lightbox-info-footer">
-                        <button class="btn danger" id="btn-delete-observation">
-                            <i data-lucide="trash-2"></i>
-                            <span>מחק תצפית</span>
-                        </button>
+                        <div class="lightbox-actions-row" style="display: flex; gap: 12px; justify-content: flex-end;">
+                            <button class="btn secondary" id="btn-edit-observation" style="flex-grow: 1;">
+                                <i data-lucide="edit-3"></i>
+                                <span>ערוך תצפית</span>
+                            </button>
+                            <button class="btn danger" id="btn-delete-observation" style="flex-grow: 1;">
+                                <i data-lucide="trash-2"></i>
+                                <span>מחק תצפית</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
