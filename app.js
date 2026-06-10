@@ -317,13 +317,6 @@ function initImageUploadDropzone() {
     const dropzone = dom.dropzone;
     const fileInput = dom.inputFileImage;
     
-    // לחיצה על אזור הגרירה
-    dropzone.addEventListener('click', (e) => {
-        if (e.target !== fileInput && !e.target.closest('#btn-remove-image-file')) {
-            fileInput.click();
-        }
-    });
-    
     // גרירה מעל האזור
     dropzone.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -425,6 +418,7 @@ async function handleSelectedImageFile(file) {
         const objectUrl = URL.createObjectURL(file);
         dom.imgPreview.src = objectUrl;
         dom.dropzonePlaceholder.classList.add('hidden');
+        dom.dropzoneLoader.classList.add('hidden');
         dom.dropzonePreview.classList.remove('hidden');
         dom.inputFileImage.required = false;
     }
