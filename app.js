@@ -18,6 +18,7 @@ let editingObservationId = null;
 let selectedImageFile = null;
 let cropperInstance = null;
 let activeCroppingFile = null;
+let cropperDragMode = 'move';
 
 // --- אלמנטים מה-DOM ---
 const dom = {
@@ -84,6 +85,15 @@ const dom = {
     cropperSourceImg: document.getElementById('cropper-source-img'),
     btnCropperRotateCcw: document.getElementById('btn-cropper-rotate-ccw'),
     btnCropperRotateCw: document.getElementById('btn-cropper-rotate-cw'),
+    btnCropperRatio45: document.getElementById('btn-cropper-ratio-4-5'),
+    btnCropperRatio11: document.getElementById('btn-cropper-ratio-1-1'),
+    btnCropperRatioOriginal: document.getElementById('btn-cropper-ratio-original'),
+    btnCropperRatioFree: document.getElementById('btn-cropper-ratio-free'),
+    btnCropperZoomIn: document.getElementById('btn-cropper-zoom-in'),
+    btnCropperZoomOut: document.getElementById('btn-cropper-zoom-out'),
+    btnCropperToggleMode: document.getElementById('btn-cropper-toggle-mode'),
+    btnCropperReset: document.getElementById('btn-cropper-reset'),
+    btnCropperUseOriginal: document.getElementById('btn-cropper-use-original'),
     btnCropperCancel: document.getElementById('btn-cropper-cancel'),
     btnCropperSave: document.getElementById('btn-cropper-save'),
     
@@ -181,6 +191,79 @@ function registerEventListeners() {
     });
     dom.btnCropperRotateCw.addEventListener('click', () => {
         if (cropperInstance) cropperInstance.rotate(90);
+    });
+    dom.btnCropperRatio45.addEventListener('click', () => {
+        if (cropperInstance) cropperInstance.setAspectRatio(4 / 5);
+        setActiveRatioButton(dom.btnCropperRatio45);
+    });
+    dom.btnCropperRatio11.addEventListener('click', () => {
+        if (cropperInstance) cropperInstance.setAspectRatio(1 / 1);
+        setActiveRatioButton(dom.btnCropperRatio11);
+    });
+    dom.btnCropperRatioOriginal.addEventListener('click', () => {
+        if (cropperInstance) {
+            const imageData = cropperInstance.getImageData();
+            const ratio = imageData.naturalWidth / imageData.naturalHeight;
+            cropperInstance.setAspectRatio(ratio);
+        }
+        setActiveRatioButton(dom.btnCropperRatioOriginal);
+    });
+    dom.btnCropperRatioFree.addEventListener('click', () => {
+        if (cropperInstance) cropperInstance.setAspectRatio(NaN);
+        setActiveRatioButton(dom.btnCropperRatioFree);
+    });
+    dom.btnCropperZoomIn.addEventListener('click', () => {
+        if (cropperInstance) cropperInstance.zoom(0.1);
+    });
+    dom.btnCropperZoomOut.addEventListener('click', () => {
+        if (cropperInstance) cropperInstance.zoom(-0.1);
+    });
+    dom.btnCropperToggleMode.addEventListener('click', () => {
+        if (!cropperInstance) return;
+        if (cropperDragMode === 'move') {
+            cropperDragMode = 'crop';
+            cropperInstance.setDragMode('crop');
+            document.getElementById('mode-icon-move').style.display = 'none';
+            document.getElementById('mode-icon-crop').style.display = 'inline-block';
+            document.getElementById('mode-text').textContent = 'עריכת מסגרת';
+            dom.btnCropperToggleMode.classList.add('active-mode');
+        } else {
+            cropperDragMode = 'move';
+            cropperInstance.setDragMode('move');
+            document.getElementById('mode-icon-move').style.display = 'inline-block';
+            document.getElementById('mode-icon-crop').style.display = 'none';
+            document.getElementById('mode-text').textContent = 'גרירת תמונה';
+            dom.btnCropperToggleMode.classList.remove('active-mode');
+        }
+    });
+    dom.btnCropperReset.addEventListener('click', () => {
+        if (cropperInstance) {
+            cropperInstance.reset();
+            cropperDragMode = 'move';
+            cropperInstance.setDragMode('move');
+            document.getElementById('mode-icon-move').style.display = 'inline-block';
+            document.getElementById('mode-icon-crop').style.display = 'none';
+            document.getElementById('mode-text').textContent = 'גרירת תמונה';
+            dom.btnCropperToggleMode.classList.remove('active-mode');
+        }
+    });
+    dom.btnCropperUseOriginal.addEventListener('click', () => {
+        if (!activeCroppingFile) return;
+        
+        selectedImageFile = activeCroppingFile;
+        
+        if (dom.imgPreview.src && dom.imgPreview.src.startsWith('blob:')) {
+            URL.revokeObjectURL(dom.imgPreview.src);
+        }
+        const objectUrl = URL.createObjectURL(selectedImageFile);
+        dom.imgPreview.src = objectUrl;
+        
+        dom.dropzonePlaceholder.classList.add('hidden');
+        dom.dropzoneLoader.classList.add('hidden');
+        dom.dropzonePreview.classList.remove('hidden');
+        dom.inputFileImage.required = false;
+        
+        closeCropperModal();
     });
     dom.btnCropperCancel.addEventListener('click', closeCropperModal);
     dom.btnCropperSave.addEventListener('click', handleCropperSave);
@@ -455,14 +538,45 @@ function openCropperModal(file) {
     }
     
     cropperInstance = new Cropper(dom.cropperSourceImg, {
-        aspectRatio: NaN, // חיתוך חופשי
-        viewMode: 1,
+        aspectRatio: 4 / 5, // מותאם לכרטיסיות כברירת מחדל
+        dragMode: 'move',   // גרירת התמונה במקום ציור ריבועים
         autoCropArea: 0.9,
         responsive: true,
         background: false,
+        viewMode: 1,
     });
     
+    // איפוס מצב גרירה
+    cropperDragMode = 'move';
+    const modeIconMove = document.getElementById('mode-icon-move');
+    const modeIconCrop = document.getElementById('mode-icon-crop');
+    const modeText = document.getElementById('mode-text');
+    if (modeIconMove) modeIconMove.style.display = 'inline-block';
+    if (modeIconCrop) modeIconCrop.style.display = 'none';
+    if (modeText) modeText.textContent = 'גרירת תמונה';
+    if (dom.btnCropperToggleMode) dom.btnCropperToggleMode.classList.remove('active-mode');
+    
+    setActiveRatioButton(dom.btnCropperRatio45);
     lucide.createIcons();
+}
+
+function setActiveRatioButton(activeBtn) {
+    const buttons = [
+        dom.btnCropperRatio45, 
+        dom.btnCropperRatio11, 
+        dom.btnCropperRatioOriginal, 
+        dom.btnCropperRatioFree
+    ];
+    buttons.forEach(btn => {
+        if (btn) {
+            btn.classList.remove('primary');
+            btn.classList.add('secondary');
+        }
+    });
+    if (activeBtn) {
+        activeBtn.classList.remove('secondary');
+        activeBtn.classList.add('primary');
+    }
 }
 
 function closeCropperModal() {
