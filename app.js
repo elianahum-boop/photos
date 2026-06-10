@@ -217,6 +217,7 @@ function loadCloudCredentials() {
             dom.badgeDemoMode.classList.add('hidden');
         } catch (error) {
             console.error("שגיאה באתחול לקוח Supabase:", error);
+            alert("שגיאה באתחול לקוח Supabase: " + error.message);
             initDemoMode();
         }
     } else {
