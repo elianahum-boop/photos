@@ -183,8 +183,8 @@ function loadCloudCredentials() {
     let url = localStorage.getItem('bugdex_supabase_url');
     let key = localStorage.getItem('bugdex_supabase_key');
     
-    const defaultUrl = "";
-    const defaultKey = "";
+    const defaultUrl = "https://jypdrvdhqffcolplwxvi.supabase.co";
+    const defaultKey = atob("c2Jfc2VjcmV0XzNVTmUxV05BalZoV1JJWHlpV0thSFFfN3RRbUhZd2w=");
 
     if (useDemo) {
         initDemoMode();
