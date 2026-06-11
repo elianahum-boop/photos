@@ -293,10 +293,12 @@ create table if not exists public.observations (
   category text not null,
   location text not null,
   notes text,
-  image_url text not null
+  image_url text not null,
+  is_favorite boolean default false
 );
 
 alter table public.observations disable row level security;
+alter table public.observations add column if not exists is_favorite boolean default false;
 
 -- 2. יצירת תיקיית האחסון (Bucket) בשם 'album' אם אינה קיימת
 insert into storage.buckets (id, name, public)
@@ -342,8 +344,11 @@ using ( bucket_id = 'album' );</pre>
             
             <div class="lightbox-layout">
                 <!-- צד התמונה -->
-                <div class="lightbox-media-wrapper">
+                <div class="lightbox-media-wrapper" style="position: relative;">
                     <img src="" alt="תמונת תצפית מוגדלת" class="lightbox-image" id="lightbox-main-img">
+                    <button class="btn-star-card" id="btn-lightbox-star" title="סמן כמועדף" style="top: 16px; left: 16px; width: 48px; height: 48px; background: rgba(0,0,0,0.6);">
+                        <i data-lucide="star" style="width: 24px; height: 24px;"></i>
+                    </button>
                 </div>
                 
                 <!-- צד המידע -->
@@ -474,6 +479,6 @@ using ( bucket_id = 'album' );</pre>
     </div>
 
     <!-- App Logic Script -->
-    <script src="app.js?v=18"></script>
+    <script src="app.js?v=19"></script>
 </body>
 </html>

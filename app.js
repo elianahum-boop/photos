@@ -87,6 +87,7 @@ const dom = {
     lightboxBadgeCategory: document.getElementById('lightbox-badge-category'),
     lightboxBugName: document.getElementById('lightbox-bug-name'),
     lightboxDate: document.getElementById('lightbox-observation-date'),
+    btnLightboxStar: document.getElementById('btn-lightbox-star'),
     lightboxLocation: document.getElementById('lightbox-bug-location'),
     lightboxNotes: document.getElementById('lightbox-bug-notes'),
     btnDeleteObservation: document.getElementById('btn-delete-observation'),
@@ -1300,6 +1301,9 @@ function renderGallery() {
                 <!-- TCG Card Image Frame -->
                 <div class="tcg-media-frame">
                     <img src="${obs.image_url}" alt="${obs.name}" class="bug-card-img" loading="eager">
+                    <button class="btn-star-card ${obs.is_favorite ? 'favorite' : ''}" data-id="${obs.id}" title="סמן כמועדף">
+                        <i data-lucide="star" fill="${obs.is_favorite ? 'currentColor' : 'none'}"></i>
+                    </button>
                 </div>
                 
                 <!-- TCG Card Description & Stats -->
@@ -1337,6 +1341,15 @@ function renderGallery() {
             
             // לחיצה על כרטיסייה
             card.addEventListener('click', (e) => {
+                // בדיקה אם נלחץ הכוכב (כדי לא לפתוח לייטבוקס/לבחור)
+                const starBtn = e.target.closest('.btn-star-card');
+                if (starBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleFavorite(obs.id);
+                    return;
+                }
+                
                 if (isSelectionMode) {
                     // טיפול במצב בחירה
                     e.preventDefault();
@@ -1549,6 +1562,18 @@ function openLightboxModal(observation) {
     dom.lightboxLocation.innerText = observation.location;
     dom.lightboxNotes.innerText = observation.notes ? observation.notes : "אין הערות נוספות לתצפית זו.";
     
+    // עדכון כוכב
+    if (dom.btnLightboxStar) {
+        const icon = dom.btnLightboxStar.querySelector('i');
+        if (observation.is_favorite) {
+            dom.btnLightboxStar.classList.add('favorite');
+            if (icon) icon.setAttribute('fill', 'currentColor');
+        } else {
+            dom.btnLightboxStar.classList.remove('favorite');
+            if (icon) icon.setAttribute('fill', 'none');
+        }
+    }
+    
     dom.modalLightbox.classList.remove('hidden');
     lucide.createIcons();
 }
@@ -1556,6 +1581,72 @@ function openLightboxModal(observation) {
 function closeLightboxModal() {
     dom.modalLightbox.classList.add('hidden');
     currentSelectedObservation = null;
+}
+
+// ================= ניהול מועדפים =================
+async function toggleFavorite(obsId) {
+    const obs = observations.find(o => o.id === obsId);
+    if (!obs) return;
+    
+    const newStatus = !obs.is_favorite;
+    obs.is_favorite = newStatus;
+    
+    // עדכון מיידי של ממשק המשתמש
+    const cards = document.querySelectorAll(`.btn-star-card[data-id="${obsId}"]`);
+    cards.forEach(btn => {
+        const icon = btn.querySelector('i');
+        if (newStatus) {
+            btn.classList.add('favorite');
+            if (icon) icon.setAttribute('fill', 'currentColor');
+        } else {
+            btn.classList.remove('favorite');
+            if (icon) icon.setAttribute('fill', 'none');
+        }
+    });
+    
+    // עדכון בלייטבוקס אם הוא פתוח
+    if (currentSelectedObservation && currentSelectedObservation.id === obsId && dom.btnLightboxStar) {
+        const icon = dom.btnLightboxStar.querySelector('i');
+        if (newStatus) {
+            dom.btnLightboxStar.classList.add('favorite');
+            if (icon) icon.setAttribute('fill', 'currentColor');
+        } else {
+            dom.btnLightboxStar.classList.remove('favorite');
+            if (icon) icon.setAttribute('fill', 'none');
+        }
+    }
+    
+    if (isDemoMode) {
+        localStorage.setItem('bugdex_local_observations', JSON.stringify(observations));
+    } else if (supabaseClient) {
+        try {
+            const { error } = await supabaseClient
+                .from('observations')
+                .update({ is_favorite: newStatus })
+                .eq('id', obsId);
+                
+            if (error) {
+                // If the column is completely missing, Supabase might throw an error.
+                throw error;
+            }
+        } catch (error) {
+            console.error("שגיאה בעדכון מועדפים:", error);
+            // אם יש שגיאה (למשל עמודה חסרה), להחזיר מצב
+            obs.is_favorite = !newStatus;
+            
+            cards.forEach(btn => {
+                const icon = btn.querySelector('i');
+                if (!newStatus) {
+                    btn.classList.add('favorite');
+                    if (icon) icon.setAttribute('fill', 'currentColor');
+                } else {
+                    btn.classList.remove('favorite');
+                    if (icon) icon.setAttribute('fill', 'none');
+                }
+            });
+            alert("לא ניתן לשמור כוכב בענן. ייתכן שצריך לעדכן את בסיס הנתונים (להריץ שוב את סקריפט ה-SQL בהגדרות כדי להוסיף את עמודת is_favorite).");
+        }
+    }
 }
 
 // --- מחיקת תצפית (ענן / מקומי) ---
