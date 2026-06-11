@@ -38,6 +38,7 @@ const dom = {
     // מצב בחירה מרובה
     floatingActionBar: document.getElementById('floating-action-bar'),
     selectionCountText: document.getElementById('selection-count-text'),
+    btnSelectAll: document.getElementById('btn-select-all'),
     btnDeleteSelected: document.getElementById('btn-delete-selected'),
     btnCancelSelection: document.getElementById('btn-cancel-selection'),
     
@@ -234,6 +235,9 @@ function registerEventListeners() {
     }
     if (dom.btnCancelSelection) {
         dom.btnCancelSelection.addEventListener('click', cancelSelectionMode);
+    }
+    if (dom.btnSelectAll) {
+        dom.btnSelectAll.addEventListener('click', handleSelectAll);
     }
     if (dom.btnDeleteSelected) {
         dom.btnDeleteSelected.addEventListener('click', handleDeleteSelected);
@@ -1203,23 +1207,7 @@ function renderGallery() {
     }
     
     // 1. סינון ראשוני של התצפיות לפי חיפוש ופילטר קטגוריה פעיל
-    let filtered = observations.filter(obs => {
-        // סינון קטגוריה
-        if (activeCategoryFilter !== "all" && obs.category !== activeCategoryFilter) {
-            return false;
-        }
-        
-        // סינון חיפוש
-        if (searchQuery) {
-            const nameMatch = obs.name && obs.name.toLowerCase().includes(searchQuery);
-            const locationMatch = obs.location && obs.location.toLowerCase().includes(searchQuery);
-            const notesMatch = obs.notes && obs.notes.toLowerCase().includes(searchQuery);
-            const categoryMatch = obs.category && obs.category.toLowerCase().includes(searchQuery);
-            return nameMatch || locationMatch || notesMatch || categoryMatch;
-        }
-        
-        return true;
-    });
+    let filtered = getFilteredObservations();
     
     // עדכון ספירה וסטטיסטיקה
     const totalCount = filtered.length;
@@ -1429,6 +1417,22 @@ function cancelSelectionMode() {
     renderGallery();
 }
 
+function getFilteredObservations() {
+    return observations.filter(obs => {
+        if (activeCategoryFilter !== "all" && obs.category !== activeCategoryFilter) {
+            return false;
+        }
+        if (searchQuery) {
+            const nameMatch = obs.name && obs.name.toLowerCase().includes(searchQuery);
+            const locationMatch = obs.location && obs.location.toLowerCase().includes(searchQuery);
+            const notesMatch = obs.notes && obs.notes.toLowerCase().includes(searchQuery);
+            const categoryMatch = obs.category && obs.category.toLowerCase().includes(searchQuery);
+            return nameMatch || locationMatch || notesMatch || categoryMatch;
+        }
+        return true;
+    });
+}
+
 function updateSelectionActionBar() {
     const count = selectedObservationIds.length;
     dom.selectionCountText.innerText = `${count} כרטיסיות נבחרו`;
@@ -1440,6 +1444,33 @@ function updateSelectionActionBar() {
         dom.btnDeleteSelected.style.opacity = '1';
         dom.btnDeleteSelected.style.cursor = 'pointer';
     }
+    
+    if (dom.btnSelectAll) {
+        const filtered = getFilteredObservations();
+        if (count === filtered.length && filtered.length > 0) {
+            dom.btnSelectAll.innerHTML = '<i data-lucide="square"></i> בטל בחירה';
+        } else {
+            dom.btnSelectAll.innerHTML = '<i data-lucide="check-square"></i> בחר הכל';
+        }
+        lucide.createIcons();
+    }
+}
+
+function handleSelectAll() {
+    if (!isSelectionMode) return;
+    
+    const filtered = getFilteredObservations();
+    
+    if (selectedObservationIds.length === filtered.length && filtered.length > 0) {
+        // Deselect all
+        selectedObservationIds = [];
+    } else {
+        // Select all visible
+        selectedObservationIds = filtered.map(obs => obs.id);
+    }
+    
+    updateSelectionActionBar();
+    renderGallery();
 }
 
 async function handleDeleteSelected() {
