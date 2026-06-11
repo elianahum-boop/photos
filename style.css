@@ -1850,6 +1850,7 @@ body.nature-dark-theme {
     .upload-section, 
     .empty-state-container,
     .modal-overlay,
+    .system-status-bar,
     footer,
     .app-footer,
     #btn-export-pdf,
@@ -1958,29 +1959,29 @@ body.nature-dark-theme {
     }
     
     .tcg-card-title {
-        font-size: 38px !important;
+        font-size: 50px !important;
         color: #1e3a8a !important;
         font-weight: 800 !important;
     }
     
     .tcg-element-badge {
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 24px !important;
-        border-width: 2px !important;
+        width: 65px !important;
+        height: 65px !important;
+        font-size: 32px !important;
+        border-width: 3px !important;
     }
     
     .tcg-element-badge i {
-        width: 28px !important;
-        height: 28px !important;
+        width: 36px !important;
+        height: 36px !important;
     }
     
     /* תמונה ענקית וברורה במרכז הדף */
     .tcg-media-frame {
         width: 100% !important;
-        height: 140mm !important; /* גובה תמונה מושלם ל-A4 */
+        height: 155mm !important; /* גובה תמונה מושלם ל-A4 */
         border-radius: 12px !important;
-        border: 3px solid #bae6fd !important;
+        border: 4px solid #bae6fd !important;
         background-color: #f8fafc !important;
     }
     
@@ -1991,7 +1992,7 @@ body.nature-dark-theme {
     }
     
     .tcg-card-details {
-        gap: 20px !important;
+        gap: 25px !important;
         flex-grow: 1 !important;
         justify-content: flex-start !important;
     }
@@ -1999,10 +2000,10 @@ body.nature-dark-theme {
     .tcg-info-grid {
         display: flex !important;
         flex-direction: column !important;
-        gap: 15px !important;
+        gap: 20px !important;
         border-bottom: 3px solid #bae6fd !important;
-        padding-bottom: 15px !important;
-        margin-bottom: 10px !important;
+        padding-bottom: 20px !important;
+        margin-bottom: 15px !important;
     }
     
     .tcg-info-row {
@@ -2012,13 +2013,13 @@ body.nature-dark-theme {
     }
     
     .tcg-info-label {
-        font-size: 22px !important;
+        font-size: 28px !important;
         color: #475569 !important;
         font-weight: 700 !important;
     }
     
     .tcg-info-val {
-        font-size: 22px !important;
+        font-size: 28px !important;
         color: #1e293b !important;
         max-width: 75% !important;
         font-weight: 600 !important;
@@ -2027,9 +2028,9 @@ body.nature-dark-theme {
     /* תיבת הערות מורחבת ונוחה לקריאה */
     .tcg-card-notes-box {
         background-color: rgba(255, 255, 255, 0.9) !important;
-        border: 2px solid #bae6fd !important;
+        border: 3px solid #bae6fd !important;
         border-radius: 12px !important;
-        padding: 20px !important;
+        padding: 25px !important;
         min-height: 50mm !important;
         display: flex !important;
         align-items: flex-start !important;
@@ -2037,7 +2038,7 @@ body.nature-dark-theme {
     
     .tcg-card-notes-text {
         line-height: 1.6 !important;
-        font-size: 20px !important;
+        font-size: 26px !important;
         color: #334155 !important;
     }
     
@@ -2047,7 +2048,7 @@ body.nature-dark-theme {
     
     .print-only-notes {
         display: block !important;
-        font-size: 20px !important;
+        font-size: 26px !important;
         color: #334155 !important;
         font-style: normal !important;
         text-align: right !important;
