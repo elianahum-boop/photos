@@ -1156,12 +1156,6 @@ function renderGallery() {
                             <span class="tcg-info-label">מיקום:</span>
                             <span class="tcg-info-val" title="${obs.location}">${obs.location}</span>
                         </div>
-                        ${formattedDate ? `
-                        <div class="tcg-info-row">
-                            <span class="tcg-info-label">תאריך:</span>
-                            <span class="tcg-info-val">${formattedDate}</span>
-                        </div>
-                        ` : ''}
                     </div>
                     
                     ${obs.notes ? `
