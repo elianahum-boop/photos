@@ -96,7 +96,6 @@ body.nature-dark-theme {
     width: 600px;
     height: 600px;
     background-color: var(--color-green);
-    animation: floatBlob 20s infinite alternate ease-in-out;
 }
 
 .blob-2 {
@@ -105,7 +104,6 @@ body.nature-dark-theme {
     width: 500px;
     height: 500px;
     background-color: #3b82f6; /* כחול טבעי עמוק */
-    animation: floatBlob 25s infinite alternate-reverse ease-in-out;
 }
 
 @keyframes floatBlob {
@@ -1702,19 +1700,15 @@ body.nature-dark-theme {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease !important;
+    aspect-ratio: 4/5;
     cursor: pointer;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
-    transform-style: preserve-3d;
-    perspective: 1000px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
     color: #1e293b !important; /* dark slate text */
 }
 
-/* אפקט ריחוף תלת ממדי (3D Tilt & Glow) */
+/* אפקט ריחוף בסיסי (ללא תלת ממד) */
 .nature-tcg-card:hover {
-    transform: translateY(-8px) scale(1.03) !important;
     border-color: #60a5fa !important; /* blue-400 */
-    box-shadow: 0 16px 35px rgba(96, 165, 250, 0.2), 0 12px 30px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* כותרת הקלף */
@@ -1764,11 +1758,6 @@ body.nature-dark-theme {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
-    transition: var(--transition-smooth) !important;
-}
-
-.nature-tcg-card:hover .tcg-media-frame .bug-card-img {
-    transform: scale(1.06) !important;
 }
 
 /* אזור נתונים תחתון */
@@ -1778,6 +1767,9 @@ body.nature-dark-theme {
     flex-direction: column;
     gap: 8px;
     flex-grow: 1;
+    background: transparent !important;
+    border-top: none !important;
+    backdrop-filter: none !important;
 }
 
 .tcg-info-grid {
@@ -1837,35 +1829,20 @@ body.nature-dark-theme {
     display: none !important;
 }
 
-/* שכבת ברק הולוגרפית (Shiny Reflection) */
+/* שכבת ברק הולוגרפית מבוטלת */
 .tcg-shiny-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(125deg, 
-        rgba(255, 255, 255, 0) 30%, 
-        rgba(255, 255, 255, 0.15) 40%, 
-        rgba(255, 255, 255, 0.3) 50%, 
-        rgba(255, 255, 255, 0.15) 60%, 
-        rgba(255, 255, 255, 0) 70%);
-    background-size: 200% 200%;
-    background-position: 200% 0;
-    transition: background-position 0s;
-    pointer-events: none;
-    z-index: 10;
-}
-
-.nature-tcg-card:hover .tcg-shiny-overlay {
-    background-position: -200% 0;
-    transition: background-position 1.2s ease;
+    display: none !important;
 }
 
 /* ==========================================================================
    הגדרות הדפסה וייצוא ל-PDF (Print Stylesheet) - עמוד מלא לכל קלף
    ========================================================================== */
 @media print {
+    @page {
+        size: A4 portrait;
+        margin: 5mm;
+    }
+
     /* 1. הסתרת כל האלמנטים הלא-חיוניים של הממשק */
     header, 
     .app-header,
@@ -1903,6 +1880,9 @@ body.nature-dark-theme {
     /* 3. ביטול כיווץ התיקיות והפיכת הגלריה לרציפה */
     .album-gallery {
         display: block !important;
+        gap: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
     
     .category-folder-container {
@@ -1911,7 +1891,6 @@ body.nature-dark-theme {
         padding: 0 !important;
         border: none !important;
         background: transparent !important;
-        page-break-inside: avoid !important;
     }
     
     .folder-header {
@@ -1924,6 +1903,13 @@ body.nature-dark-theme {
         margin: 0 !important;
     }
     
+    .folder-container {
+        border: none !important;
+        background: transparent !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
     .folder-container.collapsed .folder-content {
         display: block !important; /* פתיחה אוטומטית של תיקיות סגורות בהדפסה */
     }
@@ -1933,6 +1919,7 @@ body.nature-dark-theme {
         padding: 0 !important;
         margin: 0 !important;
         background: transparent !important;
+        gap: 0 !important;
     }
     
     /* 4. עיצוב הקלף הבודד שיתפוס עמוד שלם ומלא (A4) */
@@ -1942,11 +1929,10 @@ body.nature-dark-theme {
         page-break-inside: avoid !important;
         
         /* התפרסות מלאה על פני העמוד */
-        width: 100% !important;
-        height: 100vh !important;
-        max-height: 297mm !important; /* גובה A4 */
-        margin: 0 !important;
-        padding: 25mm 20mm !important; /* מרווחים אלגנטיים מהקצוות */
+        width: 190mm !important; /* קצת פחות מרוחב A4 כדי להשאיר שוליים */
+        height: 275mm !important; /* קצת פחות מגובה A4 כדי למנוע גלישה לעמוד הבא */
+        margin: 0 auto !important; /* מרכוז */
+        padding: 15mm !important; 
         box-sizing: border-box !important;
         
         /* סגנון כחול בהיר מרהיב להדפסה */
@@ -1959,7 +1945,7 @@ body.nature-dark-theme {
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important;
-        gap: 20px !important;
+        gap: 15px !important;
         box-shadow: none !important;
         transform: none !important;
     }
@@ -1967,30 +1953,30 @@ body.nature-dark-theme {
     /* הגדלת הכותרות והתוכן כדי שיתאימו לעמוד שלם */
     .tcg-card-header {
         border-bottom: 2px solid #bae6fd !important;
-        padding-bottom: 12px !important;
-        margin-bottom: 8px !important;
+        padding-bottom: 10px !important;
+        margin-bottom: 5px !important;
     }
     
     .tcg-card-title {
-        font-size: 28px !important;
+        font-size: 26px !important;
         color: #1e3a8a !important;
     }
     
     .tcg-element-badge {
-        width: 38px !important;
-        height: 38px !important;
+        width: 36px !important;
+        height: 36px !important;
         font-size: 16px !important;
     }
     
     .tcg-element-badge i {
-        width: 20px !important;
-        height: 20px !important;
+        width: 18px !important;
+        height: 18px !important;
     }
     
     /* תמונה ענקית וברורה במרכז הדף */
     .tcg-media-frame {
         width: 100% !important;
-        height: 140mm !important; /* גובה תמונה מושלם ל-A4 */
+        height: 130mm !important; /* גובה תמונה מושלם ל-A4 */
         border-radius: 10px !important;
         border: 2px solid #bae6fd !important;
         background-color: #f8fafc !important;
@@ -2003,7 +1989,7 @@ body.nature-dark-theme {
     }
     
     .tcg-card-details {
-        gap: 20px !important;
+        gap: 15px !important;
         flex-grow: 1 !important;
         justify-content: flex-start !important;
     }
@@ -2011,10 +1997,10 @@ body.nature-dark-theme {
     .tcg-info-grid {
         display: flex !important;
         flex-direction: column !important;
-        gap: 12px !important;
+        gap: 10px !important;
         border-bottom: 2px solid #bae6fd !important;
-        padding-bottom: 14px !important;
-        margin-bottom: 8px !important;
+        padding-bottom: 10px !important;
+        margin-bottom: 5px !important;
     }
     
     .tcg-info-row {
@@ -2041,14 +2027,14 @@ body.nature-dark-theme {
     .tcg-card-notes-box {
         background-color: rgba(255, 255, 255, 0.9) !important;
         border: 1.5px solid #bae6fd !important;
-        padding: 16px 20px !important;
-        min-height: 50mm !important;
+        padding: 15px !important;
+        min-height: 40mm !important;
         display: flex !important;
         align-items: flex-start !important;
     }
     
     .tcg-card-notes-text {
-        line-height: 1.6 !important;
+        line-height: 1.5 !important;
         font-size: 15px !important;
         color: #334155 !important;
     }

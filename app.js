@@ -1116,7 +1116,7 @@ function renderGallery() {
         // רינדור כרטיסיית חרק במבנה קלף אספנים (TCG)
         folderObservations.forEach((obs) => {
             const card = document.createElement('div');
-            card.className = "bug-card nature-tcg-card";
+            card.className = "nature-tcg-card";
             
             const elementInfo = getCategoryElement(obs.category);
             
@@ -1141,12 +1141,12 @@ function renderGallery() {
                 </div>
                 
                 <!-- TCG Card Image Frame -->
-                <div class="bug-card-media tcg-media-frame">
+                <div class="tcg-media-frame">
                     <img src="${obs.image_url}" alt="${obs.name}" class="bug-card-img" loading="eager">
                 </div>
                 
                 <!-- TCG Card Description & Stats -->
-                <div class="bug-card-details tcg-card-details">
+                <div class="tcg-card-details">
                     <div class="tcg-info-grid">
                         <div class="tcg-info-row">
                             <span class="tcg-info-label">קבוצה:</span>
