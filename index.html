@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=Rubik:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="style.css?v=14">
+    <link rel="stylesheet" href="style.css?v=16">
     
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -56,6 +56,10 @@
                 <button class="icon-button glow-effect" id="btn-toggle-upload" title="תצפית חדשה">
                     <i data-lucide="plus" class="btn-icon"></i>
                     <span class="btn-label">תצפית חדשה</span>
+                </button>
+                <button class="icon-button secondary" id="btn-toggle-select-mode" title="מצב בחירה">
+                    <i data-lucide="check-square" class="btn-icon"></i>
+                    <span class="btn-label">בחירה מרובה</span>
                 </button>
                 <input type="file" id="input-folder-upload" webkitdirectory directory multiple class="hidden-file-input">
                 <button class="icon-button secondary" id="btn-folder-upload" title="העלאת תיקיית תמונות">
@@ -210,11 +214,23 @@
 
     <!-- פוטר -->
     <footer class="app-footer">
-        <div class="footer-container container">
-            <p class="footer-copy">© <span id="span-current-year">2026</span> NatureDex. כל הזכויות שמורות.</p>
-            <p class="footer-credit">מערכת תיעוד תצפיות טבע בענן</p>
+        <div class="footer-content">
+            <p>פותח באהבה עם <span class="heart-icon">♥</span> | <span id="span-current-year">2026</span></p>
         </div>
     </footer>
+
+    <!-- סרגל צף לבחירה מרובה -->
+    <div id="floating-action-bar" class="floating-action-bar hidden">
+        <div class="selection-info">
+            <span id="selection-count-text">0 כרטיסיות נבחרו</span>
+        </div>
+        <div class="selection-actions">
+            <button class="btn btn-danger" id="btn-delete-selected">
+                <i data-lucide="trash-2"></i> מחיקה
+            </button>
+            <button class="btn btn-secondary" id="btn-cancel-selection">ביטול</button>
+        </div>
+    </div>
 
     <!-- ================= מודלים ומסכים צפים (Modals) ================= -->
 
@@ -455,6 +471,6 @@ using ( bucket_id = 'album' );</pre>
     </div>
 
     <!-- App Logic Script -->
-    <script src="app.js?v=15"></script>
+    <script src="app.js?v=16"></script>
 </body>
 </html>

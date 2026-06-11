@@ -32,6 +32,12 @@ const dom = {
     badgeCloudMode: document.getElementById('badge-cloud-mode'),
     spanCurrentYear: document.getElementById('span-current-year'),
     
+    // מצב בחירה מרובה
+    floatingActionBar: document.getElementById('floating-action-bar'),
+    selectionCountText: document.getElementById('selection-count-text'),
+    btnDeleteSelected: document.getElementById('btn-delete-selected'),
+    btnCancelSelection: document.getElementById('btn-cancel-selection'),
+    
     // הגדרות ענן
     modalSettings: document.getElementById('modal-settings-overlay'),
     formCloudSettings: document.getElementById('form-cloud-settings'),
@@ -217,6 +223,17 @@ function registerEventListeners() {
             dom.inputFolderUpload.click();
         });
         dom.inputFolderUpload.addEventListener('change', handleFolderUpload);
+    }
+    
+    // מצב בחירה מרובה
+    if (dom.btnToggleSelectMode) {
+        dom.btnToggleSelectMode.addEventListener('click', toggleSelectionMode);
+    }
+    if (dom.btnCancelSelection) {
+        dom.btnCancelSelection.addEventListener('click', cancelSelectionMode);
+    }
+    if (dom.btnDeleteSelected) {
+        dom.btnDeleteSelected.addEventListener('click', handleDeleteSelected);
     }
 
     // פתיחה/סגירה של הגדרות ענן
@@ -1176,6 +1193,12 @@ function getCategoryElement(category) {
 function renderGallery() {
     dom.galleryContainer.innerHTML = "";
     
+    if (isSelectionMode) {
+        dom.galleryContainer.classList.add('selection-mode');
+    } else {
+        dom.galleryContainer.classList.remove('selection-mode');
+    }
+    
     // 1. סינון ראשוני של התצפיות לפי חיפוש ופילטר קטגוריה פעיל
     let filtered = observations.filter(obs => {
         // סינון קטגוריה
@@ -1311,11 +1334,34 @@ function renderGallery() {
                 
                 <!-- Shiny card overlay effect -->
                 <div class="tcg-shiny-overlay"></div>
+                
+                <!-- Selection Checkmark -->
+                <div class="selection-checkmark"></div>
             `;
             
-            // לחיצה על כרטיסייה לפתיחת לייטבוקס
-            card.addEventListener('click', () => {
-                openLightboxModal(obs);
+            // הגדרת מצב בחירה קיים (אם הכרטיסייה במערך)
+            if (isSelectionMode && selectedObservationIds.includes(obs.id)) {
+                card.classList.add('selected');
+            }
+            
+            // לחיצה על כרטיסייה
+            card.addEventListener('click', (e) => {
+                if (isSelectionMode) {
+                    // טיפול במצב בחירה
+                    e.preventDefault();
+                    const index = selectedObservationIds.indexOf(obs.id);
+                    if (index === -1) {
+                        selectedObservationIds.push(obs.id);
+                        card.classList.add('selected');
+                    } else {
+                        selectedObservationIds.splice(index, 1);
+                        card.classList.remove('selected');
+                    }
+                    updateSelectionActionBar();
+                } else {
+                    // פתיחת לייטבוקס
+                    openLightboxModal(obs);
+                }
             });
             
             folderGrid.appendChild(card);
@@ -1330,6 +1376,121 @@ function renderGallery() {
     
     // יצירת אייקונים של Lucide לכל הגלריה מחדש
     lucide.createIcons();
+}
+
+// הגדרת משפחת צבעים ואייקונים לפי קטגוריה
+function getCategoryElement(category) {
+    const defaultElem = { color: "#94a3b8", icon: "bug", name: "רגיל" }; // אפור - ברירת מחדל
+    if (!category) return defaultElem;
+    
+    // נירמול קל
+    const cat = category.toLowerCase().trim();
+    
+    if (cat.includes("פרפר") || cat.includes("רפרף")) return { color: "#ec4899", icon: "flower", name: "פיה" }; // ורוד
+    if (cat.includes("חיפושית") || cat.includes("פשפש")) return { color: "#ef4444", icon: "shield", name: "שריון" }; // אדום
+    if (cat.includes("דבורה") || cat.includes("צרעה")) return { color: "#eab308", icon: "zap", name: "חשמל" }; // צהוב
+    if (cat.includes("זבוב") || cat.includes("יתוש")) return { color: "#a855f7", icon: "wind", name: "מעופף" }; // סגול
+    if (cat.includes("עכביש") || cat.includes("עקרב")) return { color: "#10b981", icon: "target", name: "ארסי" }; // ירוק
+    if (cat.includes("זחל") || cat.includes("תולעת")) return { color: "#84cc16", icon: "leaf", name: "עשב" }; // ירוק בהיר
+    if (cat === "nun") return { color: "#ef4444", icon: "help-circle", name: "לא מוגדר" }; // NUN אדום בולט
+    
+    return defaultElem;
+}
+
+// ================= מצב בחירה מרובה (Multi-Select) =================
+
+function toggleSelectionMode() {
+    isSelectionMode = !isSelectionMode;
+    selectedObservationIds = []; // איפוס תמיד כשמחליפים מצב
+    
+    if (isSelectionMode) {
+        dom.btnToggleSelectMode.classList.add('glow-effect');
+        dom.btnToggleSelectMode.classList.remove('secondary');
+        dom.floatingActionBar.classList.remove('hidden');
+    } else {
+        dom.btnToggleSelectMode.classList.remove('glow-effect');
+        dom.btnToggleSelectMode.classList.add('secondary');
+        dom.floatingActionBar.classList.add('hidden');
+    }
+    
+    renderGallery(); // מפעיל/מכבה את העיצוב לגלריה
+    updateSelectionActionBar();
+}
+
+function cancelSelectionMode() {
+    isSelectionMode = false;
+    selectedObservationIds = [];
+    dom.btnToggleSelectMode.classList.remove('glow-effect');
+    dom.btnToggleSelectMode.classList.add('secondary');
+    dom.floatingActionBar.classList.add('hidden');
+    renderGallery();
+}
+
+function updateSelectionActionBar() {
+    const count = selectedObservationIds.length;
+    dom.selectionCountText.innerText = `${count} כרטיסיות נבחרו`;
+    dom.btnDeleteSelected.disabled = count === 0;
+    if (count === 0) {
+        dom.btnDeleteSelected.style.opacity = '0.5';
+        dom.btnDeleteSelected.style.cursor = 'not-allowed';
+    } else {
+        dom.btnDeleteSelected.style.opacity = '1';
+        dom.btnDeleteSelected.style.cursor = 'pointer';
+    }
+}
+
+async function handleDeleteSelected() {
+    const count = selectedObservationIds.length;
+    if (count === 0) return;
+    
+    const confirmDelete = confirm(`האם את בטוחה שברצונך למחוק ${count} תצפיות? פעולה זו אינה הפיכה והתמונות יימחקו לצמיתות.`);
+    if (!confirmDelete) return;
+    
+    try {
+        const obsToDelete = observations.filter(obs => selectedObservationIds.includes(obs.id));
+        
+        if (supabaseClient) {
+            // מחיקת תמונות מ-Storage
+            const pathsToDelete = obsToDelete
+                .map(obs => {
+                    if (obs.image_url && obs.image_url.includes(STORAGE_BUCKET_NAME)) {
+                        const parts = obs.image_url.split(`${STORAGE_BUCKET_NAME}/`);
+                        return parts[1];
+                    }
+                    return null;
+                })
+                .filter(Boolean);
+                
+            if (pathsToDelete.length > 0) {
+                await supabaseClient.storage
+                    .from(STORAGE_BUCKET_NAME)
+                    .remove(pathsToDelete);
+            }
+            
+            // מחיקת תצפיות מ-Database
+            const { error: deleteError } = await supabaseClient
+                .from('observations')
+                .delete()
+                .in('id', selectedObservationIds);
+                
+            if (deleteError) throw deleteError;
+            
+        } else {
+            // מחיקה מקומית (מצב דמו)
+            let localObs = JSON.parse(localStorage.getItem('bugdex_local_observations') || "[]");
+            localObs = localObs.filter(obs => !selectedObservationIds.includes(obs.id));
+            localStorage.setItem('bugdex_local_observations', JSON.stringify(localObs));
+        }
+        
+        // איפוס בחירה וטעינה מחדש
+        alert(`נמחקו בהצלחה ${count} תצפיות.`);
+        cancelSelectionMode();
+        await loadObservations();
+        
+    } catch (error) {
+        console.error("שגיאה במחיקה מרובה:", error);
+        alert("שגיאה במחיקה: " + (error.message || error));
+    }
 }
 
 // --- לוגיקת הלייטבוקס (Lightbox Detail View) ---

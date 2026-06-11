@@ -1854,6 +1854,129 @@ body.nature-dark-theme {
     display: none !important;
 }
 
+/* ================= סרגל פעולות צף (בחירה מרובה) ================= */
+.floating-action-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 100px;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 1000;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    color: white;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-action-bar.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 50px);
+}
+
+.selection-info {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.selection-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.selection-actions .btn {
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.selection-actions .btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.selection-actions .btn-danger:hover {
+    background: #dc2626;
+}
+
+.selection-actions .btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.selection-actions .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* כרטיסיה במצב בחירה */
+.album-gallery.selection-mode .nature-tcg-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.album-gallery.selection-mode .nature-tcg-card:not(.selected) {
+    opacity: 0.8;
+    transform: scale(0.98);
+}
+
+.nature-tcg-card .selection-checkmark {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    opacity: 0;
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+.album-gallery.selection-mode .nature-tcg-card .selection-checkmark {
+    opacity: 1;
+}
+
+.nature-tcg-card.selected {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5) !important;
+    transform: scale(1.02) !important;
+    opacity: 1 !important;
+}
+
+.nature-tcg-card.selected .selection-checkmark {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
+.nature-tcg-card.selected .selection-checkmark::after {
+    content: '';
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+    margin-top: -2px;
+}
+
 /* ==========================================================================
    הגדרות הדפסה וייצוא ל-PDF (Print Stylesheet) - עמוד מלא לכל קלף
    ========================================================================== */
@@ -1871,11 +1994,13 @@ body.nature-dark-theme {
     .empty-state-container,
     .modal-overlay,
     .system-status-bar,
+    .floating-action-bar,
     footer,
     .app-footer,
     #btn-export-pdf,
     #btn-toggle-upload,
     #btn-folder-upload,
+    #btn-toggle-select-mode,
     #btn-open-settings,
     .nun-card {
         display: none !important;
