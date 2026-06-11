@@ -1945,40 +1945,42 @@ body.nature-dark-theme {
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important;
-        gap: 15px !important;
+        gap: 20px !important;
         box-shadow: none !important;
         transform: none !important;
     }
     
     /* הגדלת הכותרות והתוכן כדי שיתאימו לעמוד שלם */
     .tcg-card-header {
-        border-bottom: 2px solid #bae6fd !important;
-        padding-bottom: 10px !important;
-        margin-bottom: 5px !important;
+        border-bottom: 3px solid #bae6fd !important;
+        padding-bottom: 15px !important;
+        margin-bottom: 10px !important;
     }
     
     .tcg-card-title {
-        font-size: 26px !important;
+        font-size: 38px !important;
         color: #1e3a8a !important;
+        font-weight: 800 !important;
     }
     
     .tcg-element-badge {
-        width: 36px !important;
-        height: 36px !important;
-        font-size: 16px !important;
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 24px !important;
+        border-width: 2px !important;
     }
     
     .tcg-element-badge i {
-        width: 18px !important;
-        height: 18px !important;
+        width: 28px !important;
+        height: 28px !important;
     }
     
     /* תמונה ענקית וברורה במרכז הדף */
     .tcg-media-frame {
         width: 100% !important;
-        height: 130mm !important; /* גובה תמונה מושלם ל-A4 */
-        border-radius: 10px !important;
-        border: 2px solid #bae6fd !important;
+        height: 140mm !important; /* גובה תמונה מושלם ל-A4 */
+        border-radius: 12px !important;
+        border: 3px solid #bae6fd !important;
         background-color: #f8fafc !important;
     }
     
@@ -1989,7 +1991,7 @@ body.nature-dark-theme {
     }
     
     .tcg-card-details {
-        gap: 15px !important;
+        gap: 20px !important;
         flex-grow: 1 !important;
         justify-content: flex-start !important;
     }
@@ -1997,45 +1999,45 @@ body.nature-dark-theme {
     .tcg-info-grid {
         display: flex !important;
         flex-direction: column !important;
-        gap: 10px !important;
-        border-bottom: 2px solid #bae6fd !important;
-        padding-bottom: 10px !important;
-        margin-bottom: 5px !important;
+        gap: 15px !important;
+        border-bottom: 3px solid #bae6fd !important;
+        padding-bottom: 15px !important;
+        margin-bottom: 10px !important;
     }
     
     .tcg-info-row {
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
-        font-size: 16px !important;
     }
     
     .tcg-info-label {
-        font-size: 16px !important;
+        font-size: 22px !important;
         color: #475569 !important;
         font-weight: 700 !important;
     }
     
     .tcg-info-val {
-        font-size: 16px !important;
+        font-size: 22px !important;
         color: #1e293b !important;
-        max-width: 80% !important;
-        font-weight: 500 !important;
+        max-width: 75% !important;
+        font-weight: 600 !important;
     }
     
     /* תיבת הערות מורחבת ונוחה לקריאה */
     .tcg-card-notes-box {
         background-color: rgba(255, 255, 255, 0.9) !important;
-        border: 1.5px solid #bae6fd !important;
-        padding: 15px !important;
-        min-height: 40mm !important;
+        border: 2px solid #bae6fd !important;
+        border-radius: 12px !important;
+        padding: 20px !important;
+        min-height: 50mm !important;
         display: flex !important;
         align-items: flex-start !important;
     }
     
     .tcg-card-notes-text {
-        line-height: 1.5 !important;
-        font-size: 15px !important;
+        line-height: 1.6 !important;
+        font-size: 20px !important;
         color: #334155 !important;
     }
     
@@ -2045,7 +2047,7 @@ body.nature-dark-theme {
     
     .print-only-notes {
         display: block !important;
-        font-size: 15px !important;
+        font-size: 20px !important;
         color: #334155 !important;
         font-style: normal !important;
         text-align: right !important;
