@@ -1686,3 +1686,300 @@ body.nature-dark-theme {
     border-color: rgba(16, 185, 129, 0.4) !important;
     color: var(--color-green-light) !important;
 }
+
+/* ==========================================================================
+   NatureDex - עיצוב קלפי אספנים (TCG style cards) ועימוד הדפסה
+   ========================================================================== */
+
+.nature-tcg-card {
+    position: relative;
+    background-color: var(--bg-surface-elevated) !important;
+    border: 2px solid var(--border-glass) !important;
+    border-radius: var(--border-radius-md) !important;
+    overflow: hidden;
+    padding: 12px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease !important;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+/* אפקט ריחוף תלת ממדי (3D Tilt & Glow) */
+.nature-tcg-card:hover {
+    transform: translateY(-8px) scale(1.03) !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+    box-shadow: 0 16px 35px rgba(16, 185, 129, 0.15), 0 12px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* כותרת הקלף */
+.tcg-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 6px;
+    margin-bottom: 2px;
+}
+
+.tcg-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80%;
+}
+
+.tcg-element-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 10px;
+    flex-shrink: 0;
+}
+
+/* מסגרת התמונה */
+.tcg-media-frame {
+    width: 100% !important;
+    height: 160px !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    overflow: hidden !important;
+    background-color: #05070c !important;
+}
+
+.tcg-media-frame .bug-card-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    transition: var(--transition-smooth) !important;
+}
+
+.nature-tcg-card:hover .tcg-media-frame .bug-card-img {
+    transform: scale(1.06) !important;
+}
+
+/* אזור נתונים תחתון */
+.tcg-card-details {
+    padding: 4px 0 0 0 !important;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-grow: 1;
+}
+
+.tcg-stats-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tcg-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.tcg-stat-item i {
+    width: 12px;
+    height: 12px;
+    opacity: 0.8;
+}
+
+.tcg-stat-val {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 110px;
+}
+
+/* תיבת הערות מעוצבת בסגנון קלף פוקימון */
+.tcg-card-notes-box {
+    background-color: rgba(6, 9, 14, 0.5);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    padding: 6px 8px;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+}
+
+.tcg-card-notes-text {
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--text-muted);
+    margin: 0;
+    font-style: italic;
+    text-align: right;
+    width: 100%;
+}
+
+/* שכבת ברק הולוגרפית (Shiny Reflection) */
+.tcg-shiny-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(125deg, 
+        rgba(255, 255, 255, 0) 30%, 
+        rgba(255, 255, 255, 0.05) 40%, 
+        rgba(255, 255, 255, 0.12) 50%, 
+        rgba(255, 255, 255, 0.05) 60%, 
+        rgba(255, 255, 255, 0) 70%);
+    background-size: 200% 200%;
+    background-position: 200% 0;
+    transition: background-position 0s;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.nature-tcg-card:hover .tcg-shiny-overlay {
+    background-position: -200% 0;
+    transition: background-position 1.2s ease;
+}
+
+/* ==========================================================================
+   הגדרות הדפסה וייצוא ל-PDF (Print Stylesheet)
+   ========================================================================== */
+@media print {
+    /* 1. הסתרת כל האלמנטים הלא-חיוניים של הממשק */
+    header, 
+    .app-header,
+    .gallery-controls, 
+    .upload-section, 
+    .empty-state-container,
+    .modal-overlay,
+    footer,
+    .app-footer,
+    #btn-export-pdf,
+    #btn-toggle-upload,
+    #btn-open-settings {
+        display: none !important;
+    }
+    
+    /* 2. הגדרת גוף העמוד להדפסה נקייה */
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-family: var(--font-family);
+        margin: 0 !important;
+        padding: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .container, 
+    main {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* 3. ביטול כיווץ התיקיות והפיכת הגלריה לרציפה */
+    .album-gallery {
+        display: block !important;
+    }
+    
+    .category-folder-container {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        page-break-inside: avoid !important;
+    }
+    
+    .folder-header {
+        display: none !important; /* הסתרת כותרי תיקיות */
+    }
+    
+    .folder-content {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .folder-container.collapsed .folder-content {
+        display: block !important; /* פתיחה אוטומטית של תיקיות סגורות בהדפסה */
+    }
+    
+    .folder-grid {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+    }
+    
+    /* 4. עיצוב הקלף הבודד שיתפוס בדיוק עמוד אחד */
+    .nature-tcg-card {
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        
+        /* גודל כרטיסייה אופטימלי במרכז עמוד ההדפסה */
+        width: 80mm !important;
+        height: 130mm !important;
+        margin: 25mm auto !important;
+        padding: 16px !important;
+        box-sizing: border-box !important;
+        
+        /* הגדרות צבע לקלף כהה ויוקרתי */
+        background-color: #0c121c !important;
+        color: #f3f4f6 !important;
+        border: 2px solid #a27b5c !important;
+        border-radius: 12px !important;
+        
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+    
+    /* תמונה */
+    .tcg-media-frame {
+        height: 60mm !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        background-color: #05070c !important;
+    }
+    
+    .tcg-card-title {
+        color: #ffffff !important;
+        font-size: 16px !important;
+    }
+    
+    .tcg-stat-item {
+        color: #9ca3af !important;
+        font-size: 11px !important;
+    }
+    
+    .tcg-card-notes-box {
+        background-color: rgba(6, 9, 14, 0.8) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        min-height: 25mm !important;
+    }
+    
+    .tcg-card-notes-text {
+        color: #d1d5db !important;
+        font-size: 11px !important;
+    }
+    
+    .tcg-shiny-overlay {
+        display: none !important;
+    }
+}

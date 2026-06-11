@@ -97,6 +97,9 @@ const dom = {
     btnCropperCancel: document.getElementById('btn-cropper-cancel'),
     btnCropperSave: document.getElementById('btn-cropper-save'),
     
+    // ייצוא ל-PDF
+    btnExportPdf: document.getElementById('btn-export-pdf'),
+    
     // מסך התקדמות
     modalUploading: document.getElementById('modal-uploading-overlay')
 };
@@ -139,6 +142,15 @@ function initApp() {
 
 // --- מאזיני אירועים (Event Listeners) ---
 function registerEventListeners() {
+    // ייצוא ל-PDF
+    dom.btnExportPdf.addEventListener('click', () => {
+        if (observations.length === 0) {
+            alert("אין תצפיות באלבום לייצוא.");
+            return;
+        }
+        window.print();
+    });
+
     // פתיחה/סגירה של טופס ההעלאה
     dom.btnToggleUpload.addEventListener('click', () => togglePanel(dom.sectionUploadForm));
     dom.btnCloseUpload.addEventListener('click', () => hidePanel(dom.sectionUploadForm));
@@ -949,6 +961,25 @@ function buildCategoryFilters() {
     });
 }
 
+// --- פונקציית עזר לזיהוי "אלמנט" של התצפית (TCG Element) ---
+function getCategoryElement(category) {
+    const cat = (category || "").toLowerCase();
+    if (cat.includes("ציפור") || cat.includes("עוף") || cat.includes("bird") || cat.includes("feather") || cat.includes("נשר") || cat.includes("חסידה")) {
+        return { icon: "feather", color: "#60a5fa", name: "ציפורים" }; // Air/blue
+    }
+    if (cat.includes("חרק") || cat.includes("פרפר") || cat.includes("חיפושית") || cat.includes("insect") || cat.includes("bug") || cat.includes("דבורה") || cat.includes("נמלה")) {
+        return { icon: "bug", color: "#10b981", name: "חרקים" }; // Grass/green
+    }
+    if (cat.includes("יונק") || cat.includes("חיה") || cat.includes("חיית") || cat.includes("mammal") || cat.includes("paw") || cat.includes("כלב") || cat.includes("חתול") || cat.includes("צבי") || cat.includes("שועל")) {
+        return { icon: "paw-print", color: "#f59e0b", name: "יונקים" }; // Earth/orange
+    }
+    if (cat.includes("צמח") || cat.includes("פרח") || cat.includes("עץ") || cat.includes("plant") || cat.includes("flower") || cat.includes("sprout") || cat.includes("כלנית")) {
+        return { icon: "sprout", color: "#a78bfa", name: "צמחים" }; // Flora/purple
+    }
+    // Default element
+    return { icon: "leaf", color: "#a27b5c", name: category || "כללי" };
+}
+
 // --- רינדור הגלריה (חלוקה לתיקיות) ---
 function renderGallery() {
     dom.galleryContainer.innerHTML = "";
@@ -1033,22 +1064,62 @@ function renderGallery() {
         const folderGrid = document.createElement('div');
         folderGrid.className = "folder-grid";
         
-        // רינדור כרטיסיית חרק
+        // רינדור כרטיסיית חרק במבנה קלף אספנים (TCG)
         folderObservations.forEach((obs) => {
             const card = document.createElement('div');
-            card.className = "bug-card";
+            card.className = "bug-card nature-tcg-card";
+            
+            const elementInfo = getCategoryElement(obs.category);
+            
+            // עיבוד תאריך תצפית
+            let formattedDate = "";
+            if (obs.created_at) {
+                try {
+                    const dateObj = new Date(obs.created_at);
+                    formattedDate = dateObj.toLocaleDateString('he-IL', { day: 'numeric', month: 'numeric', year: '2-digit' });
+                } catch(e) {
+                    formattedDate = "";
+                }
+            }
             
             card.innerHTML = `
-                <div class="bug-card-media">
-                    <img src="${obs.image_url}" alt="${obs.name}" class="bug-card-img" loading="lazy">
-                </div>
-                <div class="bug-card-details">
-                    <h4 class="bug-card-title">${obs.name}</h4>
-                    <div class="bug-card-location-row">
-                        <i data-lucide="map-pin"></i>
-                        <span class="bug-card-location-text">${obs.location}</span>
+                <!-- TCG Card Header: Name & Type Icon -->
+                <div class="tcg-card-header">
+                    <span class="tcg-card-title" title="${obs.name}">${obs.name}</span>
+                    <div class="tcg-element-badge" style="background-color: ${elementInfo.color}22; border: 1px solid ${elementInfo.color}; color: ${elementInfo.color};" title="${elementInfo.name}">
+                        <i data-lucide="${elementInfo.icon}" style="width: 12px; height: 12px;"></i>
                     </div>
                 </div>
+                
+                <!-- TCG Card Image Frame -->
+                <div class="bug-card-media tcg-media-frame">
+                    <img src="${obs.image_url}" alt="${obs.name}" class="bug-card-img" loading="lazy">
+                </div>
+                
+                <!-- TCG Card Description & Stats -->
+                <div class="bug-card-details tcg-card-details">
+                    <div class="tcg-stats-row">
+                        <span class="tcg-stat-item" title="${obs.location}">
+                            <i data-lucide="map-pin"></i>
+                            <span class="tcg-stat-val">${obs.location}</span>
+                        </span>
+                        ${formattedDate ? `
+                        <span class="tcg-stat-item">
+                            <i data-lucide="calendar"></i>
+                            <span class="tcg-stat-val">${formattedDate}</span>
+                        </span>
+                        ` : ''}
+                    </div>
+                    
+                    ${obs.notes ? `
+                    <div class="tcg-card-notes-box">
+                        <p class="tcg-card-notes-text">${obs.notes.length > 55 ? obs.notes.substring(0, 52) + '...' : obs.notes}</p>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                <!-- Shiny card overlay effect -->
+                <div class="tcg-shiny-overlay"></div>
             `;
             
             // לחיצה על כרטיסייה לפתיחת לייטבוקס
