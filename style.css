@@ -1693,26 +1693,27 @@ body.nature-dark-theme {
 
 .nature-tcg-card {
     position: relative;
-    background-color: var(--bg-surface-elevated) !important;
-    border: 2px solid var(--border-glass) !important;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important; /* light sky blue */
+    border: 2.5px solid #bae6fd !important; /* blue-200 */
     border-radius: var(--border-radius-md) !important;
     overflow: hidden;
-    padding: 12px !important;
+    padding: 14px !important;
     display: flex;
     flex-direction: column;
     gap: 10px;
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease !important;
     cursor: pointer;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
     transform-style: preserve-3d;
     perspective: 1000px;
+    color: #1e293b !important; /* dark slate text */
 }
 
 /* אפקט ריחוף תלת ממדי (3D Tilt & Glow) */
 .nature-tcg-card:hover {
     transform: translateY(-8px) scale(1.03) !important;
-    border-color: rgba(16, 185, 129, 0.4) !important;
-    box-shadow: 0 16px 35px rgba(16, 185, 129, 0.15), 0 12px 30px rgba(0, 0, 0, 0.5) !important;
+    border-color: #60a5fa !important; /* blue-400 */
+    box-shadow: 0 16px 35px rgba(96, 165, 250, 0.2), 0 12px 30px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* כותרת הקלף */
@@ -1721,15 +1722,15 @@ body.nature-dark-theme {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1.5px solid #e0f2fe;
     padding-bottom: 6px;
     margin-bottom: 2px;
 }
 
 .tcg-card-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-main);
+    font-size: 15px;
+    font-weight: 800;
+    color: #1e3b8b; /* deep blue */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1740,21 +1741,22 @@ body.nature-dark-theme {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    font-size: 10px;
+    font-size: 11px;
     flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* מסגרת התמונה */
 .tcg-media-frame {
     width: 100% !important;
     height: 160px !important;
-    border-radius: 6px !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    border: 1.5px solid #e0f2fe !important;
     overflow: hidden !important;
-    background-color: #05070c !important;
+    background-color: #f8fafc !important;
 }
 
 .tcg-media-frame .bug-card-img {
@@ -1773,7 +1775,7 @@ body.nature-dark-theme {
     padding: 4px 0 0 0 !important;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
     flex-grow: 1;
 }
 
@@ -1790,13 +1792,14 @@ body.nature-dark-theme {
     align-items: center;
     gap: 4px;
     font-size: 11px;
-    color: var(--text-muted);
+    color: #475569; /* slate-600 */
 }
 
 .tcg-stat-item i {
     width: 12px;
     height: 12px;
-    opacity: 0.8;
+    opacity: 0.9;
+    color: #3b82f6; /* blue */
 }
 
 .tcg-stat-val {
@@ -1808,19 +1811,20 @@ body.nature-dark-theme {
 
 /* תיבת הערות מעוצבת בסגנון קלף פוקימון */
 .tcg-card-notes-box {
-    background-color: rgba(6, 9, 14, 0.5);
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    padding: 6px 8px;
-    min-height: 38px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    border: 1px solid rgba(147, 197, 253, 0.2);
+    padding: 8px 10px;
+    min-height: 40px;
     display: flex;
     align-items: center;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .tcg-card-notes-text {
     font-size: 11px;
     line-height: 1.4;
-    color: var(--text-muted);
+    color: #334155; /* slate-700 */
     margin: 0;
     font-style: italic;
     text-align: right;
@@ -1836,9 +1840,9 @@ body.nature-dark-theme {
     height: 100%;
     background: linear-gradient(125deg, 
         rgba(255, 255, 255, 0) 30%, 
-        rgba(255, 255, 255, 0.05) 40%, 
-        rgba(255, 255, 255, 0.12) 50%, 
-        rgba(255, 255, 255, 0.05) 60%, 
+        rgba(255, 255, 255, 0.15) 40%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        rgba(255, 255, 255, 0.15) 60%, 
         rgba(255, 255, 255, 0) 70%);
     background-size: 200% 200%;
     background-position: 200% 0;
@@ -1853,7 +1857,7 @@ body.nature-dark-theme {
 }
 
 /* ==========================================================================
-   הגדרות הדפסה וייצוא ל-PDF (Print Stylesheet)
+   הגדרות הדפסה וייצוא ל-PDF (Print Stylesheet) - עמוד מלא לכל קלף
    ========================================================================== */
 @media print {
     /* 1. הסתרת כל האלמנטים הלא-חיוניים של הממשק */
@@ -1874,7 +1878,7 @@ body.nature-dark-theme {
     /* 2. הגדרת גוף העמוד להדפסה נקייה */
     body {
         background: #ffffff !important;
-        color: #000000 !important;
+        color: #1e293b !important;
         font-family: var(--font-family);
         margin: 0 !important;
         padding: 0 !important;
@@ -1925,58 +1929,107 @@ body.nature-dark-theme {
         background: transparent !important;
     }
     
-    /* 4. עיצוב הקלף הבודד שיתפוס בדיוק עמוד אחד */
+    /* 4. עיצוב הקלף הבודד שיתפוס עמוד שלם ומלא (A4) */
     .nature-tcg-card {
         page-break-after: always !important;
         break-after: page !important;
         page-break-inside: avoid !important;
         
-        /* גודל כרטיסייה אופטימלי במרכז עמוד ההדפסה */
-        width: 80mm !important;
-        height: 130mm !important;
-        margin: 25mm auto !important;
-        padding: 16px !important;
+        /* התפרסות מלאה על פני העמוד */
+        width: 100% !important;
+        height: 100vh !important;
+        max-height: 297mm !important; /* גובה A4 */
+        margin: 0 !important;
+        padding: 25mm 20mm !important; /* מרווחים אלגנטיים מהקצוות */
         box-sizing: border-box !important;
         
-        /* הגדרות צבע לקלף כהה ויוקרתי */
-        background-color: #0c121c !important;
-        color: #f3f4f6 !important;
-        border: 2px solid #a27b5c !important;
-        border-radius: 12px !important;
+        /* סגנון כחול בהיר מרהיב להדפסה */
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+        color: #1e293b !important;
+        border: 4px solid #93c5fd !important;
+        border-radius: 16px !important;
         
         display: flex !important;
         flex-direction: column !important;
-        gap: 12px !important;
+        justify-content: space-between !important;
+        gap: 20px !important;
         box-shadow: none !important;
         transform: none !important;
     }
     
-    /* תמונה */
-    .tcg-media-frame {
-        height: 60mm !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        background-color: #05070c !important;
+    /* הגדלת הכותרות והתוכן כדי שיתאימו לעמוד שלם */
+    .tcg-card-header {
+        border-bottom: 2px solid #bae6fd !important;
+        padding-bottom: 12px !important;
+        margin-bottom: 8px !important;
     }
     
     .tcg-card-title {
-        color: #ffffff !important;
+        font-size: 28px !important;
+        color: #1e3a8a !important;
+    }
+    
+    .tcg-element-badge {
+        width: 38px !important;
+        height: 38px !important;
         font-size: 16px !important;
     }
     
-    .tcg-stat-item {
-        color: #9ca3af !important;
-        font-size: 11px !important;
+    .tcg-element-badge i {
+        width: 20px !important;
+        height: 20px !important;
     }
     
+    /* תמונה ענקית וברורה במרכז הדף */
+    .tcg-media-frame {
+        width: 100% !important;
+        height: 140mm !important; /* גובה תמונה מושלם ל-A4 */
+        border-radius: 10px !important;
+        border: 2px solid #bae6fd !important;
+        background-color: #f8fafc !important;
+    }
+    
+    .tcg-media-frame .bug-card-img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
+    
+    .tcg-card-details {
+        gap: 16px !important;
+    }
+    
+    .tcg-stats-row {
+        gap: 24px !important;
+    }
+    
+    .tcg-stat-item {
+        font-size: 16px !important;
+        color: #475569 !important;
+    }
+    
+    .tcg-stat-item i {
+        width: 18px !important;
+        height: 18px !important;
+        color: #3b82f6 !important;
+    }
+    
+    .tcg-stat-val {
+        max-width: 250px !important;
+    }
+    
+    /* תיבת הערות מורחבת ונוחה לקריאה */
     .tcg-card-notes-box {
-        background-color: rgba(6, 9, 14, 0.8) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        min-height: 25mm !important;
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        border: 1.5px solid #bae6fd !important;
+        padding: 16px 20px !important;
+        min-height: 40mm !important;
     }
     
     .tcg-card-notes-text {
-        color: #d1d5db !important;
-        font-size: 11px !important;
+        font-size: 15px !important;
+        color: #334155 !important;
+        line-height: 1.6 !important;
     }
     
     .tcg-shiny-overlay {

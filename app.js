@@ -141,6 +141,43 @@ function initApp() {
 }
 
 // --- מאזיני אירועים (Event Listeners) ---
+let collapsedStates = [];
+
+window.addEventListener('beforeprint', () => {
+    // 1. שמירת מצב התיקיות המכווצות ופתיחתן
+    const folders = document.querySelectorAll('.category-folder-container');
+    collapsedStates = [];
+    folders.forEach(folder => {
+        collapsedStates.push({
+            id: folder.id,
+            wasCollapsed: folder.classList.contains('collapsed')
+        });
+        folder.classList.remove('collapsed');
+    });
+    
+    // 2. הסרת lazy loading מכל התמונות
+    const images = document.querySelectorAll('.bug-card-img');
+    images.forEach(img => {
+        img.removeAttribute('loading');
+    });
+});
+
+window.addEventListener('afterprint', () => {
+    // 3. שחזור מצב התיקיות המכווצות
+    collapsedStates.forEach(state => {
+        const folder = document.getElementById(state.id);
+        if (folder && state.wasCollapsed) {
+            folder.classList.add('collapsed');
+        }
+    });
+    
+    // 4. החזרת lazy loading
+    const images = document.querySelectorAll('.bug-card-img');
+    images.forEach(img => {
+        img.setAttribute('loading', 'lazy');
+    });
+});
+
 function registerEventListeners() {
     // ייצוא ל-PDF
     dom.btnExportPdf.addEventListener('click', () => {
@@ -148,7 +185,19 @@ function registerEventListeners() {
             alert("אין תצפיות באלבום לייצוא.");
             return;
         }
-        window.print();
+        
+        // 1. פתיחת כל התיקיות לקראת הדפסה
+        const folders = document.querySelectorAll('.category-folder-container');
+        folders.forEach(folder => folder.classList.remove('collapsed'));
+        
+        // 2. הסרת lazy loading
+        const images = document.querySelectorAll('.bug-card-img');
+        images.forEach(img => img.removeAttribute('loading'));
+        
+        // 3. השהייה קלה של 700ms שתאפשר לדפדפן להוריד/לרנדר את התמונות במלואן
+        setTimeout(() => {
+            window.print();
+        }, 700);
     });
 
     // פתיחה/סגירה של טופס ההעלאה
@@ -1093,7 +1142,7 @@ function renderGallery() {
                 
                 <!-- TCG Card Image Frame -->
                 <div class="bug-card-media tcg-media-frame">
-                    <img src="${obs.image_url}" alt="${obs.name}" class="bug-card-img" loading="lazy">
+                    <img src="${obs.image_url}" alt="${obs.name}" class="bug-card-img" loading="eager">
                 </div>
                 
                 <!-- TCG Card Description & Stats -->
