@@ -19,10 +19,13 @@ let selectedImageFile = null;
 let cropperInstance = null;
 let activeCroppingFile = null;
 let cropperDragMode = 'move';
+let isSelectionMode = false;
+let selectedObservationIds = [];
 
 // --- אלמנטים מה-DOM ---
 const dom = {
     // כפתורים ומצבים
+    btnToggleSelectMode: document.getElementById('btn-toggle-select-mode'),
     btnToggleUpload: document.getElementById('btn-toggle-upload'),
     btnFolderUpload: document.getElementById('btn-folder-upload'),
     inputFolderUpload: document.getElementById('input-folder-upload'),
