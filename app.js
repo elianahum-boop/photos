@@ -24,6 +24,8 @@ let cropperDragMode = 'move';
 const dom = {
     // כפתורים ומצבים
     btnToggleUpload: document.getElementById('btn-toggle-upload'),
+    btnFolderUpload: document.getElementById('btn-folder-upload'),
+    inputFolderUpload: document.getElementById('input-folder-upload'),
     btnOpenSettings: document.getElementById('btn-open-settings'),
     btnCloseSettings: document.getElementById('btn-close-settings'),
     badgeDemoMode: document.getElementById('badge-demo-mode'),
@@ -208,6 +210,14 @@ function registerEventListeners() {
         resetForm();
     });
     dom.btnEmptyStateAdd.addEventListener('click', () => showPanel(dom.sectionUploadForm));
+
+    // העלאת תיקיה באצווה
+    if (dom.btnFolderUpload && dom.inputFolderUpload) {
+        dom.btnFolderUpload.addEventListener('click', () => {
+            dom.inputFolderUpload.click();
+        });
+        dom.inputFolderUpload.addEventListener('change', handleFolderUpload);
+    }
 
     // פתיחה/סגירה של הגדרות ענן
     dom.btnOpenSettings.addEventListener('click', openSettingsModal);
@@ -524,6 +534,90 @@ function initImageUploadDropzone() {
         e.stopPropagation(); // מונע הפעלת אירוע הלחיצה של ה-dropzone
         resetImagePreview();
     });
+}
+
+async function handleFolderUpload(e) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    // סינון תמונות בלבד
+    const imageFiles = Array.from(files).filter(file => {
+        const isHeic = (file.type && (file.type === 'image/heic' || file.type === 'image/heif')) || 
+                       /\.(heic|heif)$/i.test(file.name);
+        const isImage = isHeic || (file.type && file.type.startsWith('image/')) || 
+                        /\.(jpg|jpeg|png|webp|gif)$/i.test(file.name);
+        return isImage && file.size <= 8 * 1024 * 1024;
+    });
+
+    if (imageFiles.length === 0) {
+        alert("לא נמצאו תמונות חוקיות בתיקייה (או שהתמונות חורגות ממשקל 8MB).");
+        return;
+    }
+
+    // הופעת לואדר באצווה
+    dom.modalUploading.classList.remove('hidden');
+    const titleEl = document.getElementById('upload-progress-title');
+    const descEl = document.getElementById('upload-progress-desc');
+    
+    let successCount = 0;
+    
+    for (let i = 0; i < imageFiles.length; i++) {
+        const file = imageFiles[i];
+        if (titleEl) titleEl.innerText = `מעבד ומרכז תמונות... (${i+1}/${imageFiles.length})`;
+        if (descEl) descEl.innerText = file.name;
+        
+        try {
+            // המרת HEIC אם צריך ודחיסה
+            let processedBlob = file;
+            const isHeic = (file.type === 'image/heic' || file.type === 'image/heif' || /\.(heic|heif)$/i.test(file.name));
+            
+            if (isHeic && typeof heic2any !== 'undefined') {
+                processedBlob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.8 });
+                if (Array.isArray(processedBlob)) processedBlob = processedBlob[0];
+            }
+            
+            // העלאה ושמירה (Supabase או Local)
+            let finalImageUrl = "";
+            if (isSupabaseConfigured()) {
+                finalImageUrl = await uploadImageToSupabase(processedBlob, "NUN_Batch_" + Date.now() + "_" + i);
+            } else {
+                finalImageUrl = await compressImageForLocal(processedBlob);
+            }
+            
+            // יצירת התצפית והוספה למערך
+            const newObservation = {
+                id: crypto.randomUUID(),
+                created_at: new Date().toISOString(),
+                name: "NUN",
+                category: "NUN",
+                location: "",
+                notes: "",
+                image_url: finalImageUrl
+            };
+            
+            observations.unshift(newObservation);
+            successCount++;
+        } catch (err) {
+            console.error("Error processing file " + file.name, err);
+        }
+    }
+    
+    // שמירת הכל בבת אחת
+    saveObservations();
+    
+    dom.modalUploading.classList.add('hidden');
+    dom.inputFolderUpload.value = ''; // איפוס Input
+    
+    // איפוס טקסט לואדר
+    if (titleEl) titleEl.innerText = "מעלה את התמונה לענן...";
+    if (descEl) descEl.innerText = "הקובץ נשמר ומאורגן בתיקייה הייעודית ב-Storage. אנא אל תסגור את החלון.";
+    
+    if (successCount > 0) {
+        renderGallery();
+        alert(`הועלו בהצלחה ${successCount} תמונות ככרטיסיות NUN.`);
+    } else {
+        alert("אף תמונה לא הועלתה בהצלחה.");
+    }
 }
 
 async function handleSelectedImageFile(file) {
@@ -1013,6 +1107,12 @@ function buildCategoryFilters() {
 // --- פונקציית עזר לזיהוי "אלמנט" של התצפית (TCG Element) ---
 function getCategoryElement(category) {
     const cat = (category || "").toLowerCase();
+    
+    // NUN placeholder category
+    if (cat === "nun") {
+        return { icon: "help-circle", color: "#ef4444", name: "NUN" }; // Red error color
+    }
+    
     if (cat.includes("ציפור") || cat.includes("עוף") || cat.includes("bird") || cat.includes("feather") || cat.includes("נשר") || cat.includes("חסידה")) {
         return { icon: "feather", color: "#60a5fa", name: "ציפורים" }; // Air/blue
     }
@@ -1116,7 +1216,7 @@ function renderGallery() {
         // רינדור כרטיסיית חרק במבנה קלף אספנים (TCG)
         folderObservations.forEach((obs) => {
             const card = document.createElement('div');
-            card.className = "nature-tcg-card";
+            card.className = obs.name === 'NUN' ? "nature-tcg-card nun-card" : "nature-tcg-card";
             
             const elementInfo = getCategoryElement(obs.category);
             

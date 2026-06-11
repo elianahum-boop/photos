@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=Rubik:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="style.css?v=13">
+    <link rel="stylesheet" href="style.css?v=14">
     
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -53,9 +53,14 @@
                     <i data-lucide="printer" class="btn-icon"></i>
                     <span class="btn-label">ייצוא ל-PDF</span>
                 </button>
-                <button class="icon-button glow-effect" id="btn-toggle-upload" title="תיעוד חדש">
+                <button class="icon-button glow-effect" id="btn-toggle-upload" title="תצפית חדשה">
                     <i data-lucide="plus" class="btn-icon"></i>
                     <span class="btn-label">תצפית חדשה</span>
+                </button>
+                <input type="file" id="input-folder-upload" webkitdirectory directory multiple class="hidden-file-input">
+                <button class="icon-button secondary" id="btn-folder-upload" title="העלאת תיקיית תמונות">
+                    <i data-lucide="folder-plus" class="btn-icon"></i>
+                    <span class="btn-label">העלאת תיקיה</span>
                 </button>
                 <button class="icon-button secondary" id="btn-open-settings" title="הגדרות חיבור ענן">
                     <i data-lucide="settings" class="btn-icon"></i>
@@ -372,8 +377,8 @@ using ( bucket_id = 'album' );</pre>
                 <div class="spinner large"></div>
                 <i data-lucide="upload-cloud" class="uploading-inner-icon"></i>
             </div>
-            <h4 class="progress-title">מעלה את התמונה לענן...</h4>
-            <p class="progress-desc">הקובץ נשמר ומאורגן בתיקייה הייעודית ב-Storage. אנא אל תסגור את החלון.</p>
+            <h4 class="progress-title" id="upload-progress-title">מעלה את התמונה לענן...</h4>
+            <p class="progress-desc" id="upload-progress-desc">הקובץ נשמר ומאורגן בתיקייה הייעודית ב-Storage. אנא אל תסגור את החלון.</p>
         </div>
     </div>
 
@@ -450,6 +455,6 @@ using ( bucket_id = 'album' );</pre>
     </div>
 
     <!-- App Logic Script -->
-    <script src="app.js?v=11"></script>
+    <script src="app.js?v=14"></script>
 </body>
 </html>

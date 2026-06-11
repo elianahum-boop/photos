@@ -1706,6 +1706,26 @@ body.nature-dark-theme {
     color: #1e293b !important; /* dark slate text */
 }
 
+/* NUN card styling - red placeholder */
+.nun-card {
+    background-color: #fee2e2 !important;
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%) !important;
+    border: 2.5px solid #fca5a5 !important;
+}
+
+.nun-card .tcg-media-frame {
+    border-color: #fca5a5 !important;
+    background-color: #fff1f2 !important;
+}
+
+.nun-card .tcg-info-grid {
+    border-bottom-color: #fca5a5 !important;
+}
+
+.nun-card .tcg-card-title {
+    color: #dc2626 !important;
+}
+
 /* אפקט ריחוף בסיסי (ללא תלת ממד) */
 .nature-tcg-card:hover {
     border-color: #60a5fa !important; /* blue-400 */
@@ -1855,7 +1875,9 @@ body.nature-dark-theme {
     .app-footer,
     #btn-export-pdf,
     #btn-toggle-upload,
-    #btn-open-settings {
+    #btn-folder-upload,
+    #btn-open-settings,
+    .nun-card {
         display: none !important;
     }
     
