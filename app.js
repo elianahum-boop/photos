@@ -560,6 +560,7 @@ async function handleFolderUpload(e) {
     const descEl = document.getElementById('upload-progress-desc');
     
     let successCount = 0;
+    const newObservationsList = [];
     
     for (let i = 0; i < imageFiles.length; i++) {
         const file = imageFiles[i];
@@ -576,18 +577,36 @@ async function handleFolderUpload(e) {
                 if (Array.isArray(processedBlob)) processedBlob = processedBlob[0];
             }
             
-            // העלאה ושמירה (Supabase או Local)
+            // העלאה ושמירה
             let finalImageUrl = "";
-            if (isSupabaseConfigured()) {
-                finalImageUrl = await uploadImageToSupabase(processedBlob, "NUN_Batch_" + Date.now() + "_" + i);
+            if (supabaseClient) {
+                // העלאה ל-Supabase Storage
+                const fileExt = file.name.split('.').pop() || 'jpg';
+                const fileName = `NUN_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+                const safeCategory = getSafeStoragePath("NUN");
+                const filePath = `${safeCategory}/${fileName}`;
+                
+                const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                    .from(STORAGE_BUCKET_NAME)
+                    .upload(filePath, processedBlob, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+                    
+                if (uploadError) throw uploadError;
+                
+                const { data: urlData } = supabaseClient.storage
+                    .from(STORAGE_BUCKET_NAME)
+                    .getPublicUrl(filePath);
+                    
+                finalImageUrl = urlData.publicUrl;
             } else {
+                // המרה ל-Base64 לשמירה מקומית (מצב דמו)
                 finalImageUrl = await compressImageForLocal(processedBlob);
             }
             
-            // יצירת התצפית והוספה למערך
-            const newObservation = {
-                id: crypto.randomUUID(),
-                created_at: new Date().toISOString(),
+            // יצירת אובייקט התצפית
+            const newObs = {
                 name: "NUN",
                 category: "NUN",
                 location: "",
@@ -595,15 +614,39 @@ async function handleFolderUpload(e) {
                 image_url: finalImageUrl
             };
             
-            observations.unshift(newObservation);
+            // אם אנחנו שומרים מקומית נוסיף id מותאם אישית
+            if (!supabaseClient) {
+                newObs.id = `local-${Date.now()}-${i}`;
+                newObs.created_at = new Date().toISOString();
+            }
+            
+            newObservationsList.push(newObs);
             successCount++;
         } catch (err) {
             console.error("Error processing file " + file.name, err);
         }
     }
     
-    // שמירת הכל בבת אחת
-    saveObservations();
+    // שמירת כל התצפיות במסד הנתונים
+    if (newObservationsList.length > 0) {
+        if (supabaseClient) {
+            try {
+                // הכנסה באצווה (Batch insert) ל-Supabase DB
+                const { error: insertError } = await supabaseClient
+                    .from('observations')
+                    .insert(newObservationsList);
+                if (insertError) throw insertError;
+            } catch (dbError) {
+                console.error("Error saving to DB:", dbError);
+                alert("חלק מהתמונות הועלו ל-Storage אבל שגיאה מנעה את שמירתן במסד הנתונים.");
+            }
+        } else {
+            // שמירה מקומית בלבד
+            const localObs = JSON.parse(localStorage.getItem('bugdex_local_observations') || "[]");
+            const combinedObs = [...newObservationsList, ...localObs];
+            localStorage.setItem('bugdex_local_observations', JSON.stringify(combinedObs));
+        }
+    }
     
     dom.modalUploading.classList.add('hidden');
     dom.inputFolderUpload.value = ''; // איפוס Input
@@ -613,7 +656,7 @@ async function handleFolderUpload(e) {
     if (descEl) descEl.innerText = "הקובץ נשמר ומאורגן בתיקייה הייעודית ב-Storage. אנא אל תסגור את החלון.";
     
     if (successCount > 0) {
-        renderGallery();
+        await loadObservations(); // מרענן את כל הרשימה מהענן ומצייר מחדש
         alert(`הועלו בהצלחה ${successCount} תמונות ככרטיסיות NUN.`);
     } else {
         alert("אף תמונה לא הועלתה בהצלחה.");
