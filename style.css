@@ -1779,34 +1779,34 @@ body.nature-dark-theme {
     flex-grow: 1;
 }
 
-.tcg-stats-row {
+.tcg-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-bottom: 1.5px solid #e0f2fe;
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+}
+
+.tcg-info-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
+    font-size: 11px;
 }
 
-.tcg-stat-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
+.tcg-info-label {
+    font-weight: 700;
     color: #475569; /* slate-600 */
 }
 
-.tcg-stat-item i {
-    width: 12px;
-    height: 12px;
-    opacity: 0.9;
-    color: #3b82f6; /* blue */
-}
-
-.tcg-stat-val {
+.tcg-info-val {
+    color: #1e293b; /* slate-800 */
+    text-align: left;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 110px;
+    max-width: 70%;
 }
 
 /* תיבת הערות מעוצבת בסגנון קלף פוקימון */
@@ -1829,6 +1829,11 @@ body.nature-dark-theme {
     font-style: italic;
     text-align: right;
     width: 100%;
+}
+
+/* הפרדה בין הערות קצרות במסך והערות מלאות בהדפסה */
+.print-only-notes {
+    display: none !important;
 }
 
 /* שכבת ברק הולוגרפית (Shiny Reflection) */
@@ -1996,26 +2001,38 @@ body.nature-dark-theme {
     }
     
     .tcg-card-details {
-        gap: 16px !important;
+        gap: 20px !important;
+        flex-grow: 1 !important;
+        justify-content: flex-start !important;
     }
     
-    .tcg-stats-row {
-        gap: 24px !important;
+    .tcg-info-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        border-bottom: 2px solid #bae6fd !important;
+        padding-bottom: 14px !important;
+        margin-bottom: 8px !important;
     }
     
-    .tcg-stat-item {
+    .tcg-info-row {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        font-size: 16px !important;
+    }
+    
+    .tcg-info-label {
         font-size: 16px !important;
         color: #475569 !important;
+        font-weight: 700 !important;
     }
     
-    .tcg-stat-item i {
-        width: 18px !important;
-        height: 18px !important;
-        color: #3b82f6 !important;
-    }
-    
-    .tcg-stat-val {
-        max-width: 250px !important;
+    .tcg-info-val {
+        font-size: 16px !important;
+        color: #1e293b !important;
+        max-width: 80% !important;
+        font-weight: 500 !important;
     }
     
     /* תיבת הערות מורחבת ונוחה לקריאה */
@@ -2023,13 +2040,27 @@ body.nature-dark-theme {
         background-color: rgba(255, 255, 255, 0.9) !important;
         border: 1.5px solid #bae6fd !important;
         padding: 16px 20px !important;
-        min-height: 40mm !important;
+        min-height: 50mm !important;
+        display: flex !important;
+        align-items: flex-start !important;
     }
     
     .tcg-card-notes-text {
+        line-height: 1.6 !important;
         font-size: 15px !important;
         color: #334155 !important;
-        line-height: 1.6 !important;
+    }
+    
+    .screen-only-notes {
+        display: none !important;
+    }
+    
+    .print-only-notes {
+        display: block !important;
+        font-size: 15px !important;
+        color: #334155 !important;
+        font-style: normal !important;
+        text-align: right !important;
     }
     
     .tcg-shiny-overlay {

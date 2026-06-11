@@ -1147,22 +1147,27 @@ function renderGallery() {
                 
                 <!-- TCG Card Description & Stats -->
                 <div class="bug-card-details tcg-card-details">
-                    <div class="tcg-stats-row">
-                        <span class="tcg-stat-item" title="${obs.location}">
-                            <i data-lucide="map-pin"></i>
-                            <span class="tcg-stat-val">${obs.location}</span>
-                        </span>
+                    <div class="tcg-info-grid">
+                        <div class="tcg-info-row">
+                            <span class="tcg-info-label">קבוצה:</span>
+                            <span class="tcg-info-val" title="${obs.category}">${obs.category}</span>
+                        </div>
+                        <div class="tcg-info-row">
+                            <span class="tcg-info-label">מיקום:</span>
+                            <span class="tcg-info-val" title="${obs.location}">${obs.location}</span>
+                        </div>
                         ${formattedDate ? `
-                        <span class="tcg-stat-item">
-                            <i data-lucide="calendar"></i>
-                            <span class="tcg-stat-val">${formattedDate}</span>
-                        </span>
+                        <div class="tcg-info-row">
+                            <span class="tcg-info-label">תאריך:</span>
+                            <span class="tcg-info-val">${formattedDate}</span>
+                        </div>
                         ` : ''}
                     </div>
                     
                     ${obs.notes ? `
                     <div class="tcg-card-notes-box">
-                        <p class="tcg-card-notes-text">${obs.notes.length > 55 ? obs.notes.substring(0, 52) + '...' : obs.notes}</p>
+                        <p class="tcg-card-notes-text screen-only-notes">${obs.notes.length > 55 ? obs.notes.substring(0, 52) + '...' : obs.notes}</p>
+                        <p class="tcg-card-notes-text print-only-notes">${obs.notes}</p>
                     </div>
                     ` : ''}
                 </div>
