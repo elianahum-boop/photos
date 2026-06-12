@@ -485,6 +485,11 @@ body.nature-dark-theme {
     transition: var(--transition-smooth);
 }
 
+.image-dropzone.has-preview {
+    aspect-ratio: 4 / 5;
+    min-height: auto;
+}
+
 .image-dropzone:hover {
     border-color: var(--color-green);
     background-color: rgba(16, 185, 129, 0.05);

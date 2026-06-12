@@ -358,6 +358,7 @@ function registerEventListeners() {
         dom.dropzonePlaceholder.classList.add('hidden');
         dom.dropzoneLoader.classList.add('hidden');
         dom.dropzonePreview.classList.remove('hidden');
+        dom.dropzone.classList.add('has-preview');
         dom.inputFileImage.classList.add('hidden'); // מונע לחיצה על התמונה לבחירה מחדש
         dom.inputFileImage.required = false;
         
@@ -723,6 +724,7 @@ async function handleSelectedImageFile(file) {
         // הצגת לואדר
         dom.dropzonePlaceholder.classList.add('hidden');
         dom.dropzonePreview.classList.add('hidden');
+        dom.dropzone.classList.remove('has-preview');
         dom.inputFileImage.classList.remove('hidden');
         dom.dropzoneLoader.classList.remove('hidden');
         
@@ -909,6 +911,7 @@ function handleCropperSave() {
         dom.dropzonePlaceholder.classList.add('hidden');
         dom.dropzoneLoader.classList.add('hidden');
         dom.dropzonePreview.classList.remove('hidden');
+        dom.dropzone.classList.add('has-preview');
         dom.inputFileImage.classList.add('hidden');
         dom.inputFileImage.required = false;
         
@@ -922,6 +925,7 @@ function resetImagePreview() {
     }
     dom.imgPreview.src = "";
     dom.dropzonePreview.classList.add('hidden');
+    dom.dropzone.classList.remove('has-preview');
     dom.inputFileImage.classList.remove('hidden');
     dom.dropzoneLoader.classList.add('hidden');
     dom.dropzonePlaceholder.classList.remove('hidden');
@@ -1796,6 +1800,7 @@ function handleEditObservationClick() {
     dom.dropzonePlaceholder.classList.add('hidden');
     dom.dropzoneLoader.classList.add('hidden');
     dom.dropzonePreview.classList.remove('hidden');
+    dom.dropzone.classList.add('has-preview');
     dom.inputFileImage.classList.add('hidden');
     
     // המפתח לא נדרש כעת (הוא קיים)
