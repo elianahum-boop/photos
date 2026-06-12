@@ -148,9 +148,12 @@
                             <p class="placeholder-text-sub">זה עשוי לקחת מספר שניות במכשיר נייד</p>
                         </div>
                         <div class="dropzone-preview hidden" id="dropzone-preview-container">
-                            <img src="" alt="תצוגה מקדימה" class="preview-image" id="img-upload-preview">
+                            <img src="" alt="תצוגה מקדימה" class="preview-image" id="img-upload-preview" crossorigin="anonymous">
                             <button type="button" class="btn-remove-preview" id="btn-remove-image-file" title="הסר תמונה">
                                 <i data-lucide="trash-2"></i>
+                            </button>
+                            <button type="button" class="btn-crop-preview" id="btn-crop-preview" title="חתוך תמונה" style="position: absolute; top: 12px; right: 12px; width: 38px; height: 38px; border-radius: 50%; background-color: rgba(59, 130, 246, 0.85); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 15; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.2s;">
+                                <i data-lucide="crop"></i>
                             </button>
                         </div>
                     </div>
@@ -479,6 +482,6 @@ using ( bucket_id = 'album' );</pre>
     </div>
 
     <!-- App Logic Script -->
-    <script src="app.js?v=20"></script>
+    <script src="app.js?v=21"></script>
 </body>
 </html>

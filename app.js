@@ -70,6 +70,7 @@ const dom = {
     dropzonePreview: document.getElementById('dropzone-preview-container'),
     imgPreview: document.getElementById('img-upload-preview'),
     btnRemovePreview: document.getElementById('btn-remove-image-file'),
+    btnCropPreview: document.getElementById('btn-crop-preview'),
     
     // חיפוש וגלריה
     inputSearchGallery: document.getElementById('input-search-gallery'),
@@ -559,6 +560,14 @@ function initImageUploadDropzone() {
         e.stopPropagation(); // מונע הפעלת אירוע הלחיצה של ה-dropzone
         resetImagePreview();
     });
+    
+    // כפתור חיתוך תמונה קיימת
+    if (dom.btnCropPreview) {
+        dom.btnCropPreview.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleCropExistingImage();
+        });
+    }
 }
 
 async function handleFolderUpload(e) {
@@ -745,6 +754,42 @@ async function handleSelectedImageFile(file) {
     } else {
         // פתיחת מודל חיתוך עם הקובץ המקורי
         openCropperModal(file);
+    }
+}
+
+// פתיחת תמונה קיימת לחיתוך (בין אם הועלתה עכשיו או מעריכה קיימת)
+async function handleCropExistingImage() {
+    if (!dom.imgPreview.src) return;
+    
+    try {
+        if (dom.btnCropPreview) {
+            dom.btnCropPreview.style.opacity = '0.5';
+            dom.btnCropPreview.style.pointerEvents = 'none';
+        }
+        
+        // משיכת התמונה כ-Blob
+        const response = await fetch(dom.imgPreview.src);
+        if (!response.ok) throw new Error("Fetch failed");
+        
+        const blob = await response.blob();
+        
+        let filename = "existing_image.jpg";
+        if (selectedImageFile) {
+            filename = selectedImageFile.name;
+        } else if (editingObservationId) {
+            filename = `obs_${editingObservationId}.jpg`;
+        }
+        
+        const file = new File([blob], filename, { type: blob.type });
+        openCropperModal(file);
+    } catch (e) {
+        console.error("Error fetching image for crop", e);
+        alert("לא ניתן היה לטעון את התמונה לחיתוך. (ייתכן שיש חסימת CORS מתצוגה מקומית)");
+    } finally {
+        if (dom.btnCropPreview) {
+            dom.btnCropPreview.style.opacity = '1';
+            dom.btnCropPreview.style.pointerEvents = 'auto';
+        }
     }
 }
 
