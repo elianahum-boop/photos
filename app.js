@@ -557,6 +557,7 @@ function initImageUploadDropzone() {
     
     // כפתור הסרת התמונה מהתצוגה המקדימה
     dom.btnRemovePreview.addEventListener('click', (e) => {
+        e.preventDefault();
         e.stopPropagation(); // מונע הפעלת אירוע הלחיצה של ה-dropzone
         resetImagePreview();
     });
@@ -564,6 +565,7 @@ function initImageUploadDropzone() {
     // כפתור חיתוך תמונה קיימת
     if (dom.btnCropPreview) {
         dom.btnCropPreview.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             handleCropExistingImage();
         });
