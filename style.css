@@ -1500,6 +1500,13 @@ body.nature-dark-theme {
     
     .header-container {
         padding: 12px;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+    }
+    
+    .btn, .icon-button {
+        padding: 8px 12px;
     }
     
     .btn-label {
@@ -1508,10 +1515,19 @@ body.nature-dark-theme {
     
     .header-actions {
         gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
     }
     
     .brand-text .app-subtitle {
         display: none;
+    }
+    
+    .status-badge {
+        max-width: 100%;
+        white-space: normal;
+        text-align: center;
+        height: auto;
     }
     
     .brand-logo {
@@ -1534,7 +1550,12 @@ body.nature-dark-theme {
     }
     
     .folder-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 12px;
+    }
+    
+    .observations-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
         gap: 12px;
     }
     
