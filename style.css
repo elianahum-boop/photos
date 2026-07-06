@@ -614,6 +614,127 @@ body.nature-dark-theme {
 }
 
 /* ==========================================================================
+   באנר התצפית היומית לזיהוי (Daily Mystery Observation)
+   ========================================================================== */
+.daily-mystery-banner {
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(13, 148, 136, 0.24) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.15);
+    padding: 20px 24px;
+    border-radius: var(--border-radius-lg);
+    transition: var(--transition-smooth);
+}
+
+.daily-mystery-banner:hover {
+    border-color: rgba(16, 185, 129, 0.6);
+    box-shadow: 0 10px 35px -5px rgba(16, 185, 129, 0.25);
+}
+
+.daily-mystery-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.daily-mystery-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    min-width: 250px;
+}
+
+.daily-mystery-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+.daily-mystery-icon i {
+    width: 28px;
+    height: 28px;
+}
+
+.daily-mystery-badge {
+    display: inline-block;
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--color-green-light);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 100px;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+}
+
+.daily-mystery-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.daily-mystery-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.daily-mystery-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.daily-mystery-preview {
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    box-shadow: var(--shadow-soft);
+    flex-shrink: 0;
+    background: var(--bg-surface);
+}
+
+.daily-mystery-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.daily-mystery-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+@media (max-width: 650px) {
+    .daily-mystery-content, .daily-mystery-right, .daily-mystery-left {
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+        width: 100%;
+    }
+    .daily-mystery-actions {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ==========================================================================
    סרגל סינון וחיפוש
    ========================================================================== */
 .gallery-controls {

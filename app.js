@@ -81,6 +81,14 @@ const dom = {
     emptyStateSection: document.getElementById('section-empty-state'),
     btnEmptyStateAdd: document.getElementById('btn-empty-state-add'),
     
+    // באנר תצפית רנדומלית יומית לזיהוי
+    sectionDailyMystery: document.getElementById('section-daily-mystery'),
+    dailyMysteryTitle: document.getElementById('daily-mystery-title'),
+    dailyMysteryDesc: document.getElementById('daily-mystery-desc'),
+    dailyMysteryImg: document.getElementById('daily-mystery-img'),
+    btnTagDailyMystery: document.getElementById('btn-tag-daily-mystery'),
+    btnNextDailyMystery: document.getElementById('btn-next-daily-mystery'),
+    
     // לייטבוקס
     modalLightbox: document.getElementById('modal-lightbox-overlay'),
     btnCloseLightbox: document.getElementById('btn-close-lightbox'),
@@ -243,6 +251,31 @@ function registerEventListeners() {
     }
     if (dom.btnDeleteSelected) {
         dom.btnDeleteSelected.addEventListener('click', handleDeleteSelected);
+    }
+
+    // אירועי באנר אתגר יומי (תצפית רנדומלית לזיהוי)
+    if (dom.btnTagDailyMystery) {
+        dom.btnTagDailyMystery.addEventListener('click', () => {
+            if (currentMysteryObservation) {
+                editObservationDirectly(currentMysteryObservation);
+            }
+        });
+    }
+    if (dom.btnNextDailyMystery) {
+        dom.btnNextDailyMystery.addEventListener('click', () => {
+            const nunObservations = observations.filter(obs => {
+                const name = (obs.name || "").trim();
+                const cat = (obs.category || "").trim();
+                return name === "NUN" || name === "nun" || !name || cat === "NUN" || cat === "nun";
+            });
+            if (nunObservations.length > 0) {
+                const randomIndex = Math.floor(Math.random() * nunObservations.length);
+                currentMysteryObservation = nunObservations[randomIndex];
+                localStorage.setItem('bugdex_mystery_date', new Date().toDateString());
+                localStorage.setItem('bugdex_mystery_id', currentMysteryObservation.id);
+                updateDailyMysteryBanner();
+            }
+        });
     }
 
     // פתיחה/סגירה של הגדרות ענן
@@ -1252,6 +1285,88 @@ function getCategoryElement(category) {
     return { icon: "leaf", color: "#a27b5c", name: category || "כללי" };
 }
 
+// ================= באנר התצפית היומית לזיהוי (Daily Mystery Bug) =================
+let currentMysteryObservation = null;
+
+function updateDailyMysteryBanner() {
+    if (!dom.sectionDailyMystery) return;
+    
+    // סינון תצפיות לא מזוהות (NUN או ללא שם אמיתי)
+    const nunObservations = observations.filter(obs => {
+        const name = (obs.name || "").trim();
+        const cat = (obs.category || "").trim();
+        return name === "NUN" || name === "nun" || !name || cat === "NUN" || cat === "nun";
+    });
+    
+    if (nunObservations.length === 0) {
+        dom.sectionDailyMystery.classList.add('hidden');
+        return;
+    }
+    
+    dom.sectionDailyMystery.classList.remove('hidden');
+    
+    // בדיקה אם יש תצפית שמורה להיום ב-localStorage או בחירה חדשה
+    const todayStr = new Date().toDateString();
+    const storedDate = localStorage.getItem('bugdex_mystery_date');
+    const storedId = localStorage.getItem('bugdex_mystery_id');
+    
+    // אם אין תצפית נבחרת כרגע, ננסה לשחזר מהזיכרון או נבחר אחת
+    if (!currentMysteryObservation || !nunObservations.some(o => o.id === currentMysteryObservation.id)) {
+        let foundStored = null;
+        if (storedDate === todayStr && storedId) {
+            foundStored = nunObservations.find(o => String(o.id) === String(storedId));
+        }
+        
+        if (foundStored) {
+            currentMysteryObservation = foundStored;
+        } else {
+            // בחירה רנדומלית חדשה ושמירה להיום
+            const randomIndex = Math.floor(Math.random() * nunObservations.length);
+            currentMysteryObservation = nunObservations[randomIndex];
+            localStorage.setItem('bugdex_mystery_date', todayStr);
+            localStorage.setItem('bugdex_mystery_id', currentMysteryObservation.id);
+        }
+    }
+    
+    if (dom.dailyMysteryImg) dom.dailyMysteryImg.src = currentMysteryObservation.image_url || '';
+    if (dom.dailyMysteryDesc) {
+        dom.dailyMysteryDesc.innerText = `יש לך עוד ${nunObservations.length} תצפיות ללא שם במאגר. בואי נתייג את התצפית הרנדומלית של היום!`;
+    }
+}
+
+function editObservationDirectly(obs) {
+    if (!obs) return;
+    currentSelectedObservation = obs;
+    editingObservationId = obs.id;
+    
+    closeLightboxModal();
+    showPanel(dom.sectionUploadForm);
+    
+    const panelTitle = dom.sectionUploadForm.querySelector('.panel-title');
+    const isNunName = !obs.name || obs.name === 'NUN' || obs.name === 'nun';
+    const isNunCat = !obs.category || obs.category === 'NUN' || obs.category === 'nun';
+    if (panelTitle) panelTitle.innerText = `עריכת תצפית: ${isNunName ? 'תצפית ללא שם' : obs.name}`;
+    
+    const submitBtnSpan = dom.btnSubmitObservation.querySelector('span');
+    if (submitBtnSpan) submitBtnSpan.innerText = "עדכן ושמור שינויים";
+    
+    dom.inputBugName.value = isNunName ? "" : (obs.name || "");
+    dom.inputBugCategory.value = isNunCat ? "" : (obs.category || "");
+    dom.inputLocation.value = obs.location || "";
+    dom.inputNotes.value = obs.notes || "";
+    
+    dom.imgPreview.src = obs.image_url;
+    dom.dropzonePlaceholder.classList.add('hidden');
+    dom.dropzoneLoader.classList.add('hidden');
+    dom.dropzonePreview.classList.remove('hidden');
+    dom.dropzone.classList.add('has-preview');
+    dom.inputFileImage.classList.add('hidden');
+    dom.inputFileImage.required = false;
+    selectedImageFile = null;
+    
+    dom.sectionUploadForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 // --- רינדור הגלריה (חלוקה לתיקיות) ---
 function renderGallery() {
     dom.galleryContainer.innerHTML = "";
@@ -1432,6 +1547,9 @@ function renderGallery() {
         
         dom.galleryContainer.appendChild(folderContainer);
     });
+    
+    // עדכון באנר תצפית יומית לזיהוי
+    updateDailyMysteryBanner();
     
     // יצירת אייקונים של Lucide לכל הגלריה מחדש
     lucide.createIcons();
@@ -1784,14 +1902,16 @@ function handleEditObservationClick() {
     
     // שינוי כותרת הטופס והכפתור
     const panelTitle = dom.sectionUploadForm.querySelector('.panel-title');
-    if (panelTitle) panelTitle.innerText = `עריכת תצפית: ${obs.name}`;
+    const isNunName = !obs.name || obs.name === 'NUN' || obs.name === 'nun';
+    const isNunCat = !obs.category || obs.category === 'NUN' || obs.category === 'nun';
+    if (panelTitle) panelTitle.innerText = `עריכת תצפית: ${isNunName ? 'תצפית ללא שם' : obs.name}`;
     
     const submitBtnSpan = dom.btnSubmitObservation.querySelector('span');
     if (submitBtnSpan) submitBtnSpan.innerText = "עדכן ושמור שינויים";
     
     // מילוי שדות הטופס
-    dom.inputBugName.value = obs.name || "";
-    dom.inputBugCategory.value = obs.category || "";
+    dom.inputBugName.value = isNunName ? "" : (obs.name || "");
+    dom.inputBugCategory.value = isNunCat ? "" : (obs.category || "");
     dom.inputLocation.value = obs.location || "";
     dom.inputNotes.value = obs.notes || "";
     

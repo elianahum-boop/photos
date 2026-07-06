@@ -169,6 +169,36 @@
             </form>
         </section>
 
+        <!-- באנר תצפית רנדומלית יומית לזיהוי (Daily Mystery Observation) -->
+        <section class="daily-mystery-banner glass-panel hidden" id="section-daily-mystery">
+            <div class="daily-mystery-content">
+                <div class="daily-mystery-right">
+                    <div class="daily-mystery-icon">
+                        <i data-lucide="sparkles"></i>
+                    </div>
+                    <div class="daily-mystery-info">
+                        <div class="daily-mystery-badge">🎉 אתגר יומי</div>
+                        <h3 class="daily-mystery-title" id="daily-mystery-title">התצפית היומית לזיהוי! 🎲</h3>
+                        <p class="daily-mystery-desc" id="daily-mystery-desc">יש לך תצפיות ללא שם שעדיין מחכות לתיוג. בואי נתייג אחת היום!</p>
+                    </div>
+                </div>
+                <div class="daily-mystery-left">
+                    <div class="daily-mystery-preview">
+                        <img src="" alt="תצפית לזיהוי" id="daily-mystery-img" class="daily-mystery-thumb">
+                    </div>
+                    <div class="daily-mystery-actions">
+                        <button class="btn primary glow-effect" id="btn-tag-daily-mystery" type="button">
+                            <i data-lucide="tag" class="btn-icon"></i>
+                            <span>תייגי אותי עכשיו!</span>
+                        </button>
+                        <button class="icon-button secondary" id="btn-next-daily-mystery" type="button" title="החליפי לחיה רנדומלית אחרת">
+                            <i data-lucide="shuffle"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- סרגל סינון, חיפוש וסיכום -->
         <section class="gallery-controls glass-panel">
             <div class="controls-search-row">
@@ -482,6 +512,6 @@ using ( bucket_id = 'album' );</pre>
     </div>
 
     <!-- App Logic Script -->
-    <script src="app.js?v=26"></script>
+    <script src="app.js?v=27"></script>
 </body>
 </html>
