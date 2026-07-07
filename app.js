@@ -132,21 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initApp() {
-    // מחיקה חד-פעמית של נתוני הדמו הישנים מהדפדפן ואיפוס מפתחות ישנים
-    if (!localStorage.getItem('bugdex_version_reset_v5')) {
-        localStorage.removeItem('bugdex_local_observations');
-        localStorage.removeItem('bugdex_use_demo');
-        localStorage.removeItem('bugdex_supabase_url');
-        localStorage.removeItem('bugdex_supabase_key');
-        localStorage.setItem('bugdex_version_reset_v5', 'true');
-    }
-
-    // מחיקת מפתח ישן שאינו פעיל
-    if (localStorage.getItem('bugdex_supabase_key') === 'sb_publishable_-o9hUJ4nF6POupZukkC_5w_K7n2RWOt') {
-        localStorage.removeItem('bugdex_supabase_key');
-        localStorage.removeItem('bugdex_supabase_url');
-    }
-
     // 1. הגדרת השנה הנוכחית בפוטר
     if (dom.spanCurrentYear) {
         dom.spanCurrentYear.innerText = new Date().getFullYear();
