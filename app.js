@@ -2002,7 +2002,11 @@ Reply ONLY with a valid JSON object in Hebrew, with exactly these 3 keys:
                 throw new Error(data.error.message);
             }
 
-            const jsonString = data.candidates[0].content.parts[0].text;
+            let jsonString = data.candidates[0].content.parts[0].text;
+            
+            // Clean markdown json formatting if Gemini adds it
+            jsonString = jsonString.replace(/```json\n/g, '').replace(/```/g, '').trim();
+            
             const result = JSON.parse(jsonString);
 
             if (result.name) dom.inputBugName.value = result.name;
