@@ -102,6 +102,13 @@
 
             <form class="observation-form" id="form-add-observation" autocomplete="off">
                 <div class="form-grid">
+                    <!-- כפתור זיהוי אוטומטי AI -->
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <button type="button" id="btn-ai-identify" class="btn-primary" style="width: 100%; background: linear-gradient(45deg, #10b981, #3b82f6); border: none; border-radius: 8px; padding: 10px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <i data-lucide="sparkles" style="width: 18px; height: 18px;"></i>
+                            זהה תמונה אוטומטית (AI)
+                        </button>
+                    </div>
                     <!-- פרטי התצפית -->
                     <div class="form-group">
                         <label for="input-bug-name" class="form-label">שם בעל החיים / הממצא *</label>
@@ -359,6 +366,11 @@ using ( bucket_id = 'album' );</pre>
                         </div>
                     </div>
                     
+                    <div class="form-group">
+                        <label for="input-gemini-key" class="form-label">???? ?????? ????? ??????? (Google Gemini AI Key) - ?????????</label>
+                        <input type="password" id="input-gemini-key" class="form-input ltr-input" placeholder="AIza...">
+                    </div>
+                    
                     <div class="modal-actions">
                         <button type="button" class="btn secondary" id="btn-clear-settings">מחק הגדרות</button>
                         <button type="submit" class="btn primary glow-effect" id="btn-save-settings">שמור והתחבר</button>
@@ -515,3 +527,4 @@ using ( bucket_id = 'album' );</pre>
     <script src="app.js?v=28"></script>
 </body>
 </html>
+

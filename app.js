@@ -47,6 +47,8 @@ const dom = {
     formCloudSettings: document.getElementById('form-cloud-settings'),
     inputSupabaseUrl: document.getElementById('input-supabase-url'),
     inputSupabaseKey: document.getElementById('input-supabase-key'),
+    inputGeminiKey: document.getElementById('input-gemini-key'),
+    btnAiIdentify: document.getElementById('btn-ai-identify'),
     btnToggleKeyVisibility: document.getElementById('btn-toggle-key-visibility'),
     btnCopySql: document.getElementById('btn-copy-sql'),
     btnClearSettings: document.getElementById('btn-clear-settings'),
@@ -448,6 +450,7 @@ function loadCloudCredentials() {
 
         dom.inputSupabaseUrl.value = url;
         dom.inputSupabaseKey.value = key;
+        if (dom.inputGeminiKey) dom.inputGeminiKey.value = localStorage.getItem('bugdex_gemini_key') || '';
         
         try {
             // אתחול לקוח Supabase מה-CDN
@@ -512,11 +515,14 @@ function saveCloudSettings(e) {
     
     const url = dom.inputSupabaseUrl.value.trim();
     const key = dom.inputSupabaseKey.value.trim();
+    const geminiKey = dom.inputGeminiKey ? dom.inputGeminiKey.value.trim() : '';
     
     if (url && key) {
         localStorage.removeItem('bugdex_use_demo');
         localStorage.setItem('bugdex_supabase_url', url);
         localStorage.setItem('bugdex_supabase_key', key);
+        if (geminiKey) localStorage.setItem('bugdex_gemini_key', geminiKey);
+        else localStorage.removeItem('bugdex_gemini_key');
         
         loadCloudCredentials();
         closeSettingsModal();
@@ -532,9 +538,11 @@ function clearCloudSettings() {
         localStorage.setItem('bugdex_use_demo', 'true');
         localStorage.removeItem('bugdex_supabase_url');
         localStorage.removeItem('bugdex_supabase_key');
+        localStorage.removeItem('bugdex_gemini_key');
         
         dom.inputSupabaseUrl.value = "";
         dom.inputSupabaseKey.value = "";
+        if (dom.inputGeminiKey) dom.inputGeminiKey.value = "";
         
         initDemoMode();
         closeSettingsModal();
@@ -1911,4 +1919,105 @@ function handleEditObservationClick() {
     // המפתח לא נדרש כעת (הוא קיים)
     dom.inputFileImage.required = false;
     selectedImageFile = null;
+}
+
+
+// --- Gemini AI Auto-Identify ---
+if (dom.btnAiIdentify) {
+    dom.btnAiIdentify.addEventListener('click', async () => {
+        const geminiKey = localStorage.getItem('bugdex_gemini_key');
+        if (!geminiKey) {
+            alert('כדי להשתמש בזיהוי חכמה (AI), אנא הזיני מפתח API של Google Gemini AI בהגדרות (סמל גלגל השיניים).');
+            openSettingsModal();
+            return;
+        }
+
+        let base64Image = null;
+        
+        // 1. Check if we have a new file selected
+        if (dom.inputBugImage.files && dom.inputBugImage.files.length > 0) {
+            const file = dom.inputBugImage.files[0];
+            base64Image = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                reader.readAsDataURL(file);
+            });
+        } 
+        // 2. Check if we are editing an existing observation with an image URL
+        else if (currentEditingId) {
+            const obs = observations.find(o => o.id === currentEditingId);
+            if (obs && obs.image_url) {
+                dom.btnAiIdentify.innerHTML = '<i data-lucide="loader" class="spin"></i> מוריד תמונה...';
+                try {
+                    const response = await fetch(obs.image_url);
+                    const blob = await response.blob();
+                    base64Image = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                        reader.readAsDataURL(blob);
+                    });
+                } catch (e) {
+                    console.error('שגיאה בהורדת התמונה:', e);
+                    alert('לא הצלחנו לקרוא את התמונה הקיימת. נסי להעלות אותה מחדש.');
+                    dom.btnAiIdentify.innerHTML = '<i data-lucide="sparkles"></i> זהה תמונה אוטומטית (AI)';
+                    return;
+                }
+            }
+        }
+
+        if (!base64Image) {
+            alert('אנא העלי תמונה תחילה כדי שה-AI יוכל לזהות אותה!');
+            return;
+        }
+
+        // Send to Gemini
+        dom.btnAiIdentify.innerHTML = '<i data-lucide="loader" class="spin"></i> מזהה חרק... נא להמתין';
+        dom.btnAiIdentify.disabled = true;
+
+        try {
+            const prompt = `You are an expert entomologist in Israel. Identify the insect/animal in this image. 
+Reply ONLY with a valid JSON object in Hebrew, with exactly these 3 keys:
+- "name": The common name of the insect in Hebrew.
+- "category": The biological order or family (e.g. פרפרים, חיפושיות, עכבישים).
+- "notes": A very short, one sentence interesting fact about it in Hebrew.`;
+
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [
+                            { text: prompt },
+                            { inlineData: { mimeType: "image/jpeg", data: base64Image } }
+                        ]
+                    }],
+                    generationConfig: {
+                        responseMimeType: "application/json"
+                    }
+                })
+            });
+
+            const data = await res.json();
+            if (data.error) {
+                throw new Error(data.error.message);
+            }
+
+            const jsonString = data.candidates[0].content.parts[0].text;
+            const result = JSON.parse(jsonString);
+
+            if (result.name) dom.inputBugName.value = result.name;
+            if (result.category) dom.inputBugCategory.value = result.category;
+            if (result.notes) dom.inputNotes.value = result.notes;
+            
+            alert('הזיהוי עבר בהצלחה! השדות מולאו אוטומטית.');
+
+        } catch (e) {
+            console.error('Gemini API Error:', e);
+            alert('הייתה שגיאה בניתוח התמונה מול שרתי ה-AI: ' + e.message);
+        } finally {
+            dom.btnAiIdentify.innerHTML = '<i data-lucide="sparkles"></i> זהה תמונה אוטומטית (AI)';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            dom.btnAiIdentify.disabled = false;
+        }
+    });
 }
