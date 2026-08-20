@@ -1980,6 +1980,7 @@ if (dom.btnAiIdentify) {
 
         let base64Image = null;
         let publicUrl = null;
+        let lensWindow = null;
         
         // 1. Check if we have a new file selected
         if (dom.inputFileImage && dom.inputFileImage.files && dom.inputFileImage.files.length > 0) {
@@ -1995,6 +1996,10 @@ if (dom.btnAiIdentify) {
             const obs = observations.find(o => o.id === editingObservationId);
             if (obs && obs.image_url) {
                 publicUrl = obs.image_url;
+                
+                // Open Lens immediately in a new tab synchronously (bypasses popup blocker)
+                lensWindow = window.open(`https://lens.google.com/uploadbyurl?url=${encodeURIComponent(publicUrl)}`, '_blank');
+                
                 dom.btnAiIdentify.innerHTML = '<i data-lucide="loader" class="spin"></i> מוריד תמונה...';
                 try {
                     const response = await fetch(obs.image_url);
@@ -2006,7 +2011,6 @@ if (dom.btnAiIdentify) {
                     });
                 } catch (err) {
                     console.error('שגיאה בהורדת התמונה:', err);
-                    alert('לא הצלחנו לקרוא את התמונה הקיימת. נסי להעלות אותה מחדש.');
                     dom.btnAiIdentify.innerHTML = '<i data-lucide="sparkles"></i> זהה תמונה אוטומטית (AI)';
                     return;
                 }
@@ -2054,29 +2058,18 @@ Reply ONLY with a valid JSON object in Hebrew, with exactly these 3 keys:
             if (result.category) dom.inputBugCategory.value = result.category;
             if (result.notes) dom.inputNotes.value = result.notes;
             
-            // Now handle Google Lens part
-            if (publicUrl) {
-                alert('הזיהוי עבר בהצלחה! השדות מולאו אוטומטית על ידי ה-AI.\n\nמיד ייפתח גוגל לנס בחלון חדש כדי שתוכלי לאמת את המידע.');
-                const lensUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(publicUrl)}`;
-                const newWindow = window.open(lensUrl, '_blank');
-                if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-                    window.location.href = lensUrl;
-                }
-            } else {
-                alert('הזיהוי עבר בהצלחה! השדות מולאו אוטומטית.\n\n(שימי לב: גוגל לנס לא ייפתח כיוון שהתמונה טרם נשמרה לאלבום ואין לה קישור רשת).');
+            // Success!
+            if (!publicUrl) {
+                alert('הזיהוי עבר בהצלחה! השדות מולאו אוטומטית על ידי ה-AI.\n\n(שימי לב: גוגל לנס לא נפתח כיוון שהתמונה טרם נשמרה לאלבום).');
             }
 
         } catch (err) {
             console.error('Gemini API Error:', err);
-            alert('הייתה שגיאה מול שרתי ה-AI: ' + err.message + '\n\nאם התמונה שמורה כבר באלבום, גוגל לנס ייפתח כעת כגיבוי.');
+            alert('הערה: ה-AI של גוגל עמוס כרגע או החזיר שגיאה (' + err.message + ').\nאבל לא נורא, בשביל זה יש לנו את הגיבוי של גוגל לנס שנפתח עכשיו!');
             
-            // Fallback to Lens on AI failure
-            if (publicUrl) {
-                const lensUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(publicUrl)}`;
-                const newWindow = window.open(lensUrl, '_blank');
-                if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-                    window.location.href = lensUrl;
-                }
+            if (publicUrl && (!lensWindow || lensWindow.closed || typeof lensWindow.closed == 'undefined')) {
+                // If it was blocked initially, fallback to redirecting the current page
+                window.location.href = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(publicUrl)}`;
             }
         } finally {
             dom.btnAiIdentify.innerHTML = '<i data-lucide="sparkles"></i> זהה תמונה אוטומטית (AI)';
