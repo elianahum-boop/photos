@@ -534,8 +534,8 @@ function saveCloudSettings(e) {
 }
 
 function clearCloudSettings() {
-    if (confirm("האם אתה בטוח שברצונך למחוק את הגדרות החיבור לענן ולחזור למצב דמו מקומי?")) {
-        localStorage.setItem('bugdex_use_demo', 'true');
+    if (confirm("האם אתה בטוח שברצונך לאפס את ההגדרות לברירת המחדל של הענן?")) {
+        localStorage.removeItem('bugdex_use_demo');
         localStorage.removeItem('bugdex_supabase_url');
         localStorage.removeItem('bugdex_supabase_key');
         localStorage.removeItem('bugdex_gemini_key');
@@ -544,8 +544,10 @@ function clearCloudSettings() {
         dom.inputSupabaseKey.value = "";
         if (dom.inputGeminiKey) dom.inputGeminiKey.value = "";
         
-        initDemoMode();
         closeSettingsModal();
+        
+        // Reload credentials from defaults
+        loadCloudCredentials();
         loadObservations();
     }
 }
