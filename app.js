@@ -1935,15 +1935,13 @@ if (dom.btnAiIdentify) {
 
         const obs = observations.find(o => o.id === currentEditingId);
         if (obs && obs.image_url) {
-            // Open Google Lens with the image URL using anchor tag to bypass mobile popup blockers
+            // Open Google Lens with the image URL using window.open with a fallback to location.href
             const lensUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(obs.image_url)}`;
-            const link = document.createElement('a');
-            link.href = lensUrl;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const newWindow = window.open(lensUrl, '_blank');
+            if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                // Popup blocked, fallback to redirecting current tab
+                window.location.href = lensUrl;
+            }
         } else {
             alert('לא נמצאה תמונה שמורה לחיפוש.');
         }
