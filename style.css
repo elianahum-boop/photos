@@ -490,9 +490,9 @@ body.nature-dark-theme {
 }
 
 .image-dropzone.has-preview {
-    aspect-ratio: 16 / 9;
-    max-height: 250px;
-    min-height: auto;
+    aspect-ratio: auto;
+    max-height: 300px;
+    min-height: 200px;
 }
 
 .image-dropzone:hover {
@@ -580,7 +580,7 @@ body.nature-dark-theme {
 .preview-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .btn-remove-preview {
