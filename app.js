@@ -1982,8 +1982,8 @@ if (dom.btnAiIdentify) {
         let publicUrl = null;
         
         // 1. Check if we have a new file selected
-        if (dom.inputBugImage.files && dom.inputBugImage.files.length > 0) {
-            const file = dom.inputBugImage.files[0];
+        if (dom.inputFileImage && dom.inputFileImage.files && dom.inputFileImage.files.length > 0) {
+            const file = dom.inputFileImage.files[0];
             base64Image = await new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onloadend = () => resolve(reader.result.split(',')[1]);
