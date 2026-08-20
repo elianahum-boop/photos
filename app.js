@@ -1978,13 +1978,13 @@ if (dom.btnAiIdentify) {
         dom.btnAiIdentify.innerHTML = "פותח את גוגל לנס...";
         
         setTimeout(() => {
-            if (!currentEditingId) {
+            if (!editingObservationId) {
                 alert('התמונה עדיין לא נשמרה באלבום! נא לשמור את התצפית קודם, ואז ללחוץ על התמונה באלבום ולבחור בזיהוי החכם.');
                 dom.btnAiIdentify.innerHTML = originalText;
                 return;
             }
 
-            const obs = observations.find(o => o.id === currentEditingId);
+            const obs = observations.find(o => o.id === editingObservationId);
             if (obs && obs.image_url) {
                 const lensUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(obs.image_url)}`;
                 // Force top-level navigation, 100% bypasses popup blockers
