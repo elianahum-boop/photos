@@ -58,6 +58,7 @@ const dom = {
     btnCloseUpload: document.getElementById('btn-close-upload'),
     formAddObservation: document.getElementById('form-add-observation'),
     inputBugName: document.getElementById('input-bug-name'),
+    datalistAnimalNames: document.getElementById('animal-names-list'),
     inputBugCategory: document.getElementById('input-bug-category'),
     inputLocation: document.getElementById('input-observation-location'),
     inputNotes: document.getElementById('input-observation-notes'),
@@ -292,6 +293,12 @@ function registerEventListeners() {
     dom.inputSearchGallery.addEventListener('input', (e) => {
         searchQuery = e.target.value.toLowerCase().trim();
         renderGallery();
+    // Populate datalist for auto-complete
+    if (dom.datalistAnimalNames) {
+        const uniqueNames = [...new Set(observations.map(o => o.name).filter(n => n && n !== 'NUN'))].sort();
+        dom.datalistAnimalNames.innerHTML = uniqueNames.map(name => `<option value="${name}">`).join('');
+    }
+
     });
     
     // לייטבוקס
@@ -1195,6 +1202,12 @@ async function loadObservations() {
         // עדכון הפילטרים ורינדור הגלריה
         buildCategoryFilters();
         renderGallery();
+    // Populate datalist for auto-complete
+    if (dom.datalistAnimalNames) {
+        const uniqueNames = [...new Set(observations.map(o => o.name).filter(n => n && n !== 'NUN'))].sort();
+        dom.datalistAnimalNames.innerHTML = uniqueNames.map(name => `<option value="${name}">`).join('');
+    }
+
         
     } catch (error) {
         console.error("שגיאה בטעינת התצפיות:", error);
@@ -1235,6 +1248,12 @@ function buildCategoryFilters() {
             btn.classList.add('active');
             activeCategoryFilter = cat;
             renderGallery();
+    // Populate datalist for auto-complete
+    if (dom.datalistAnimalNames) {
+        const uniqueNames = [...new Set(observations.map(o => o.name).filter(n => n && n !== 'NUN'))].sort();
+        dom.datalistAnimalNames.innerHTML = uniqueNames.map(name => `<option value="${name}">`).join('');
+    }
+
         });
         
         dom.categoryFiltersContainer.appendChild(btn);
@@ -1252,6 +1271,12 @@ function buildCategoryFilters() {
         btnAll.classList.add('active');
         activeCategoryFilter = "all";
         renderGallery();
+    // Populate datalist for auto-complete
+    if (dom.datalistAnimalNames) {
+        const uniqueNames = [...new Set(observations.map(o => o.name).filter(n => n && n !== 'NUN'))].sort();
+        dom.datalistAnimalNames.innerHTML = uniqueNames.map(name => `<option value="${name}">`).join('');
+    }
+
     });
 }
 
@@ -1585,7 +1610,13 @@ function toggleSelectionMode() {
         dom.floatingActionBar.classList.add('hidden');
     }
     
-    renderGallery(); // מפעיל/מכבה את העיצוב לגלריה
+    renderGallery();
+    // Populate datalist for auto-complete
+    if (dom.datalistAnimalNames) {
+        const uniqueNames = [...new Set(observations.map(o => o.name).filter(n => n && n !== 'NUN'))].sort();
+        dom.datalistAnimalNames.innerHTML = uniqueNames.map(name => `<option value="${name}">`).join('');
+    }
+ // מפעיל/מכבה את העיצוב לגלריה
     updateSelectionActionBar();
 }
 
@@ -1596,6 +1627,12 @@ function cancelSelectionMode() {
     dom.btnToggleSelectMode.classList.add('secondary');
     dom.floatingActionBar.classList.add('hidden');
     renderGallery();
+    // Populate datalist for auto-complete
+    if (dom.datalistAnimalNames) {
+        const uniqueNames = [...new Set(observations.map(o => o.name).filter(n => n && n !== 'NUN'))].sort();
+        dom.datalistAnimalNames.innerHTML = uniqueNames.map(name => `<option value="${name}">`).join('');
+    }
+
 }
 
 function getFilteredObservations() {
@@ -1652,6 +1689,12 @@ function handleSelectAll() {
     
     updateSelectionActionBar();
     renderGallery();
+    // Populate datalist for auto-complete
+    if (dom.datalistAnimalNames) {
+        const uniqueNames = [...new Set(observations.map(o => o.name).filter(n => n && n !== 'NUN'))].sort();
+        dom.datalistAnimalNames.innerHTML = uniqueNames.map(name => `<option value="${name}">`).join('');
+    }
+
 }
 
 async function handleDeleteSelected() {
@@ -1944,6 +1987,26 @@ if (dom.btnAiIdentify) {
             }
         } else {
             alert('לא נמצאה תמונה שמורה לחיפוש.');
+        }
+    });
+}
+
+// --- Smart Auto-Fill (Memory) ---
+if (dom.inputBugName) {
+    dom.inputBugName.addEventListener('input', (e) => {
+        const typedName = e.target.value.trim();
+        if (!typedName) return;
+        
+        // Find if this animal exists in previous observations
+        const existing = observations.find(o => o.name === typedName);
+        if (existing) {
+            // Auto-fill if empty
+            if (!dom.inputBugCategory.value && existing.category && existing.category !== 'NUN') {
+                dom.inputBugCategory.value = existing.category;
+            }
+            if (!dom.inputNotes.value && existing.notes) {
+                dom.inputNotes.value = existing.notes;
+            }
         }
     });
 }

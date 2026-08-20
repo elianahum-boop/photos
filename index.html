@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=Rubik:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="style.css?v=20">
+    <link rel="stylesheet" href="style.css?v=29">
     
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -104,15 +104,16 @@
                 <div class="form-grid">
                     <!-- כפתור זיהוי אוטומטי AI -->
                     <div class="form-group" style="grid-column: 1 / -1;">
-                        <button type="button" id="btn-ai-identify" class="btn-primary" style="width: 100%; background: linear-gradient(45deg, #10b981, #3b82f6); border: none; border-radius: 8px; padding: 10px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <button type="button" id="btn-ai-identify" class="btn-primary" style="cursor: pointer; width: 100%; background: linear-gradient(45deg, #10b981, #3b82f6); border: none; border-radius: 8px; padding: 10px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px;">
                             <i data-lucide="sparkles" style="width: 18px; height: 18px;"></i>
                             זהה תמונה אוטומטית (AI)
                         </button>
                     </div>
                     <!-- פרטי התצפית -->
+                    <datalist id="animal-names-list"></datalist>
                     <div class="form-group">
                         <label for="input-bug-name" class="form-label">שם בעל החיים / הממצא *</label>
-                        <input type="text" id="input-bug-name" class="form-input" placeholder="לדוגמה: פרפר זנב סנונית, סיקסק, צבי ארץ-ישראלי" required>
+                        <input type="text" id="input-bug-name" class="form-input" list="animal-names-list" placeholder="לדוגמה: פרפר זנב סנונית, סיקסק, צבי ארץ-ישראלי" required>
                     </div>
 
                     <div class="form-group">
@@ -524,7 +525,7 @@ using ( bucket_id = 'album' );</pre>
     </div>
 
     <!-- App Logic Script -->
-    <script src="app.js?v=28"></script>
+    <script src="app.js?v=29"></script>
 </body>
 </html>
 
