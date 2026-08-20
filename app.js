@@ -1967,30 +1967,121 @@ function handleEditObservationClick() {
 }
 
 
-// --- Google Lens Auto-Identify ---
+// --- Gemini AI & Google Lens Integration ---
 if (dom.btnAiIdentify) {
-    dom.btnAiIdentify.innerHTML = '<i data-lucide="search"></i> זיהוי חכם ברשת (Google Lens)';
-    dom.btnAiIdentify.addEventListener('click', function(e) {
+    dom.btnAiIdentify.addEventListener('click', async (e) => {
         e.preventDefault();
-        
-        if (!editingObservationId) {
-            alert('התמונה עדיין לא נשמרה באלבום! נא לשמור את התצפית קודם, ואז ללחוץ על התמונה באלבום ולבחור בזיהוי החכם.');
+        const geminiKey = localStorage.getItem('bugdex_gemini_key');
+        if (!geminiKey) {
+            alert('כדי להשתמש בזיהוי החכם המשולב, אנא הזיני מפתח API של Google Gemini AI בהגדרות (סמל גלגל השיניים).');
+            openSettingsModal();
             return;
         }
 
-        const obs = observations.find(o => o.id === editingObservationId);
-        if (obs && obs.image_url) {
-            const lensUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(obs.image_url)}`;
-            
-            // Synchronous window.open for new tab (not blocked if synchronous)
-            const newWindow = window.open(lensUrl, '_blank');
-            
-            // Fallback just in case popup is strictly blocked
-            if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-                window.location.href = lensUrl;
+        let base64Image = null;
+        let publicUrl = null;
+        
+        // 1. Check if we have a new file selected
+        if (dom.inputBugImage.files && dom.inputBugImage.files.length > 0) {
+            const file = dom.inputBugImage.files[0];
+            base64Image = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                reader.readAsDataURL(file);
+            });
+        } 
+        // 2. Check if we are editing an existing observation with an image URL
+        else if (editingObservationId) {
+            const obs = observations.find(o => o.id === editingObservationId);
+            if (obs && obs.image_url) {
+                publicUrl = obs.image_url;
+                dom.btnAiIdentify.innerHTML = '<i data-lucide="loader" class="spin"></i> מוריד תמונה...';
+                try {
+                    const response = await fetch(obs.image_url);
+                    const blob = await response.blob();
+                    base64Image = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                        reader.readAsDataURL(blob);
+                    });
+                } catch (err) {
+                    console.error('שגיאה בהורדת התמונה:', err);
+                    alert('לא הצלחנו לקרוא את התמונה הקיימת. נסי להעלות אותה מחדש.');
+                    dom.btnAiIdentify.innerHTML = '<i data-lucide="sparkles"></i> זהה תמונה אוטומטית (AI)';
+                    return;
+                }
             }
-        } else {
-            alert('לא נמצאה תמונה שמורה לחיפוש.');
+        }
+
+        if (!base64Image) {
+            alert('אנא העלי תמונה תחילה כדי שה-AI יוכל לזהות אותה!');
+            return;
+        }
+
+        // Send to Gemini
+        dom.btnAiIdentify.innerHTML = '<i data-lucide="loader" class="spin"></i> ה-AI מנתח את התמונה...';
+        dom.btnAiIdentify.disabled = true;
+
+        try {
+            const prompt = `You are an expert entomologist in Israel. Identify the insect/animal in this image. 
+Reply ONLY with a valid JSON object in Hebrew, with exactly these 3 keys:
+- "name": The common name of the insect in Hebrew.
+- "category": The biological order or family (e.g. פרפרים, חיפושיות, עכבישים).
+- "notes": A very short, one sentence interesting fact about it in Hebrew.`;
+
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${geminiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [
+                            { text: prompt },
+                            { inlineData: { mimeType: "image/jpeg", data: base64Image } }
+                        ]
+                    }],
+                    generationConfig: { responseMimeType: "application/json" }
+                })
+            });
+
+            const data = await res.json();
+            if (data.error) throw new Error(data.error.message);
+
+            let jsonString = data.candidates[0].content.parts[0].text;
+            jsonString = jsonString.replace(/```json\n/g, '').replace(/```/g, '').trim();
+            const result = JSON.parse(jsonString);
+
+            if (result.name) dom.inputBugName.value = result.name;
+            if (result.category) dom.inputBugCategory.value = result.category;
+            if (result.notes) dom.inputNotes.value = result.notes;
+            
+            // Now handle Google Lens part
+            if (publicUrl) {
+                alert('הזיהוי עבר בהצלחה! השדות מולאו אוטומטית על ידי ה-AI.\n\nמיד ייפתח גוגל לנס בחלון חדש כדי שתוכלי לאמת את המידע.');
+                const lensUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(publicUrl)}`;
+                const newWindow = window.open(lensUrl, '_blank');
+                if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                    window.location.href = lensUrl;
+                }
+            } else {
+                alert('הזיהוי עבר בהצלחה! השדות מולאו אוטומטית.\n\n(שימי לב: גוגל לנס לא ייפתח כיוון שהתמונה טרם נשמרה לאלבום ואין לה קישור רשת).');
+            }
+
+        } catch (err) {
+            console.error('Gemini API Error:', err);
+            alert('הייתה שגיאה מול שרתי ה-AI: ' + err.message + '\n\nאם התמונה שמורה כבר באלבום, גוגל לנס ייפתח כעת כגיבוי.');
+            
+            // Fallback to Lens on AI failure
+            if (publicUrl) {
+                const lensUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(publicUrl)}`;
+                const newWindow = window.open(lensUrl, '_blank');
+                if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                    window.location.href = lensUrl;
+                }
+            }
+        } finally {
+            dom.btnAiIdentify.innerHTML = '<i data-lucide="sparkles"></i> זהה תמונה אוטומטית (AI)';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            dom.btnAiIdentify.disabled = false;
         }
     });
 }
