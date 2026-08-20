@@ -1970,24 +1970,35 @@ function handleEditObservationClick() {
 // --- Google Lens Auto-Identify ---
 if (dom.btnAiIdentify) {
     dom.btnAiIdentify.innerHTML = '<i data-lucide="search"></i> זיהוי חכם ברשת (Google Lens)';
-    dom.btnAiIdentify.addEventListener('click', function() {
-        if (!currentEditingId) {
-            alert('כדי לזהות חרק עם Google Lens, אנא העלי את התצפית לאלבום קודם, ואז לחצי על תמונת החרק בגלריה וביחרי שוב בזיהוי החכם.');
-            return;
-        }
-
-        const obs = observations.find(o => o.id === currentEditingId);
-        if (obs && obs.image_url) {
-            // Open Google Lens with the image URL using window.open with a fallback to location.href
-            const lensUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(obs.image_url)}`;
-            const newWindow = window.open(lensUrl, '_blank');
-            if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-                // Popup blocked, fallback to redirecting current tab
-                window.location.href = lensUrl;
+    dom.btnAiIdentify.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Visual feedback so we know the button was actually clicked
+        const originalText = dom.btnAiIdentify.innerHTML;
+        dom.btnAiIdentify.innerHTML = "פותח את גוגל לנס...";
+        
+        setTimeout(() => {
+            if (!currentEditingId) {
+                alert('התמונה עדיין לא נשמרה באלבום! נא לשמור את התצפית קודם, ואז ללחוץ על התמונה באלבום ולבחור בזיהוי החכם.');
+                dom.btnAiIdentify.innerHTML = originalText;
+                return;
             }
-        } else {
-            alert('לא נמצאה תמונה שמורה לחיפוש.');
-        }
+
+            const obs = observations.find(o => o.id === currentEditingId);
+            if (obs && obs.image_url) {
+                const lensUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(obs.image_url)}`;
+                // Force top-level navigation, 100% bypasses popup blockers
+                window.location.href = lensUrl;
+                
+                // Restore text after 2 seconds in case they use the back button
+                setTimeout(() => {
+                    dom.btnAiIdentify.innerHTML = originalText;
+                }, 2000);
+            } else {
+                alert('לא נמצאה תמונה שמורה לחיפוש.');
+                dom.btnAiIdentify.innerHTML = originalText;
+            }
+        }, 100);
     });
 }
 
