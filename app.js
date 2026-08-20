@@ -1927,7 +1927,7 @@ function handleEditObservationClick() {
 // --- Google Lens Auto-Identify ---
 if (dom.btnAiIdentify) {
     dom.btnAiIdentify.innerHTML = '<i data-lucide="search"></i> זיהוי חכם ברשת (Google Lens)';
-    dom.btnAiIdentify.addEventListener('click', async () => {
+    dom.btnAiIdentify.addEventListener('click', function() {
         if (!currentEditingId) {
             alert('כדי לזהות חרק עם Google Lens, אנא העלי את התצפית לאלבום קודם, ואז לחצי על תמונת החרק בגלריה וביחרי שוב בזיהוי החכם.');
             return;
@@ -1935,9 +1935,15 @@ if (dom.btnAiIdentify) {
 
         const obs = observations.find(o => o.id === currentEditingId);
         if (obs && obs.image_url) {
-            // Open Google Lens with the image URL
+            // Open Google Lens with the image URL using anchor tag to bypass mobile popup blockers
             const lensUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(obs.image_url)}`;
-            window.open(lensUrl, '_blank');
+            const link = document.createElement('a');
+            link.href = lensUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         } else {
             alert('לא נמצאה תמונה שמורה לחיפוש.');
         }

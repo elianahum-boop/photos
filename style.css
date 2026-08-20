@@ -490,7 +490,8 @@ body.nature-dark-theme {
 }
 
 .image-dropzone.has-preview {
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 16 / 9;
+    max-height: 250px;
     min-height: auto;
 }
 
