@@ -1973,32 +1973,25 @@ if (dom.btnAiIdentify) {
     dom.btnAiIdentify.addEventListener('click', function(e) {
         e.preventDefault();
         
-        // Visual feedback so we know the button was actually clicked
-        const originalText = dom.btnAiIdentify.innerHTML;
-        dom.btnAiIdentify.innerHTML = "פותח את גוגל לנס...";
-        
-        setTimeout(() => {
-            if (!editingObservationId) {
-                alert('התמונה עדיין לא נשמרה באלבום! נא לשמור את התצפית קודם, ואז ללחוץ על התמונה באלבום ולבחור בזיהוי החכם.');
-                dom.btnAiIdentify.innerHTML = originalText;
-                return;
-            }
+        if (!editingObservationId) {
+            alert('התמונה עדיין לא נשמרה באלבום! נא לשמור את התצפית קודם, ואז ללחוץ על התמונה באלבום ולבחור בזיהוי החכם.');
+            return;
+        }
 
-            const obs = observations.find(o => o.id === editingObservationId);
-            if (obs && obs.image_url) {
-                const lensUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(obs.image_url)}`;
-                // Force top-level navigation, 100% bypasses popup blockers
+        const obs = observations.find(o => o.id === editingObservationId);
+        if (obs && obs.image_url) {
+            const lensUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(obs.image_url)}`;
+            
+            // Synchronous window.open for new tab (not blocked if synchronous)
+            const newWindow = window.open(lensUrl, '_blank');
+            
+            // Fallback just in case popup is strictly blocked
+            if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
                 window.location.href = lensUrl;
-                
-                // Restore text after 2 seconds in case they use the back button
-                setTimeout(() => {
-                    dom.btnAiIdentify.innerHTML = originalText;
-                }, 2000);
-            } else {
-                alert('לא נמצאה תמונה שמורה לחיפוש.');
-                dom.btnAiIdentify.innerHTML = originalText;
             }
-        }, 100);
+        } else {
+            alert('לא נמצאה תמונה שמורה לחיפוש.');
+        }
     });
 }
 
